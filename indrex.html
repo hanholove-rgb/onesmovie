@@ -1,0 +1,2541 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>여행 홍보 영상 메이커</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0C1618">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#F7F9FC;
+  --ink-2:#FFFFFF;
+  --ink-3:#F3F6FA;
+  --line:#D9E2EC;
+  --sun:#FFB800;
+  --sea:#4F8CFF;
+  --paper:#17212B;
+  --mute:#6B7785;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--ink);
+  color:var(--paper);
+  font-family:'Noto Sans KR',-apple-system,sans-serif;
+  font-size:14px;
+  line-height:1.6;
+  padding:0 0 80px;
+}
+header{
+  border-bottom:1px solid var(--line);
+  padding:24px 20px 20px;
+  background:#FFFFFF;
+  display:flex;
+  align-items:flex-end;
+  gap:14px;
+  flex-wrap:wrap;
+}
+h1{
+  font-family:'Anton',sans-serif;
+  font-size:34px;
+  letter-spacing:.02em;
+  line-height:.95;
+  text-transform:uppercase;
+}
+h1 em{font-style:normal;color:var(--sea)}
+.tag{color:var(--mute);font-size:13px;padding-bottom:5px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+.grid{display:grid;grid-template-columns:1fr 380px;gap:26px;margin-top:26px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+
+/* 결과 영역 */
+.result{display:none;flex-direction:column;gap:8px;margin-top:10px}
+.result button{width:100%}
+
+/* 휴대폰 */
+@media(max-width:640px){
+  body{padding:0}
+  .wrap{padding:12px}
+  .grid{gap:12px}
+  .panel{padding:13px;border-radius:10px}
+  h1{font-size:22px}
+  /* iOS 는 16px 미만 입력칸에 초점이 가면 화면을 확대한다 */
+  input,select,textarea,button{font-size:16px}
+  input[type=text],input[type=number],input[type=password],select{padding:11px 12px}
+  button{padding:13px 14px;min-height:46px}
+  .row{flex-wrap:wrap}
+  .row>button{flex:1 1 100%}
+  .two{grid-template-columns:1fr}
+  .results{grid-template-columns:repeat(3,1fr);max-height:none}
+  .results img{height:74px}
+  .clip{grid-template-columns:64px 1fr}
+  .clip img{width:64px;height:64px}
+  .iconbtn{min-width:38px;min-height:38px}
+  .stage{position:static}
+  canvas{max-height:58vh}
+  .sline{grid-template-columns:1fr}
+  .sline span{text-align:left}
+}
+@media(max-width:640px) and (orientation:landscape){
+  canvas{max-height:78vh}
+}
+
+.panel{background:var(--ink-2);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 4px 18px rgba(23,33,43,.05)}
+.panel + .panel{margin-top:16px}
+.panel h2{
+  font-family:'Anton',sans-serif;font-size:15px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--sun);margin-bottom:14px;font-weight:400;
+}
+label{display:block;font-size:12px;color:var(--mute);margin-bottom:5px}
+input[type=text],input[type=number],input[type=password],select,textarea{
+  width:100%;background:var(--ink);border:1px solid var(--line);color:var(--paper);
+  border-radius:6px;padding:9px 11px;font-family:inherit;font-size:13px;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--sea)}
+button{
+  background:var(--sea);color:#fff;border:none;border-radius:6px;
+  padding:10px 16px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;
+}
+button:hover{filter:brightness(1.04);transform:translateY(-1px)}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.ghost{background:#FFFFFF;color:var(--paper);border:1px solid var(--line);font-weight:500}
+button.ghost:hover{border-color:var(--sea);filter:none}
+.row{display:flex;gap:8px;align-items:flex-end}
+.row > *{flex:1}
+.row > button{flex:0 0 auto}
+
+#stage{
+  position:relative;background:#0F1720;border:1px solid var(--line);
+  border-radius:10px;overflow:hidden;aspect-ratio:16/9;
+}
+#canvas{width:100%;height:100%;display:block}
+.controls{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.time{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:.04em;color:var(--sun)}
+.time small{color:var(--mute);font-size:13px;font-family:'Noto Sans KR'}
+
+.results{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:7px;margin-top:12px;max-height:360px;overflow-y:auto}
+.results img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:5px;cursor:pointer;border:2px solid transparent}
+.results img:hover{border-color:var(--sun)}
+
+#clips{display:flex;flex-direction:column;gap:9px;margin-top:12px}
+.clip{
+  display:grid;grid-template-columns:18px 74px 1fr auto;gap:11px;align-items:center;
+  background:var(--ink-3);border:1px solid var(--line);border-radius:8px;padding:9px;
+  transition:opacity .15s,transform .12s;
+}
+.clip.dragging{opacity:.35;transform:scale(.98)}
+.clip.drag-over{border-color:var(--sea);box-shadow:0 0 0 2px rgba(78,205,196,.35)}
+.drag-handle{
+  cursor:grab;color:var(--mute);font-size:15px;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  user-select:none;touch-action:none;
+}
+.drag-handle:active{cursor:grabbing}
+.clip img{width:74px;height:50px;object-fit:cover;border-radius:4px}
+.clip video.thumb{width:74px;height:50px;object-fit:cover;border-radius:4px;display:block}
+.clip-type{font-size:10px;font-weight:700;padding:2px 5px;border-radius:4px;letter-spacing:.03em}
+.clip-type.photo{background:rgba(78,205,196,.18);color:var(--sea)}
+.clip-type.video{background:rgba(247,183,49,.18);color:var(--sun)}
+.trim{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px}
+.trim label{font-size:10.5px;color:var(--mute)}
+.trim input[type=range]{width:100%;accent-color:var(--sun)}
+.trim-nums{display:flex;justify-content:space-between;font-size:10px;color:var(--mute);margin-top:1px}
+.clip input[type=text]{padding:6px 9px;font-size:12px}
+.clip .meta{display:flex;gap:6px;margin-top:6px}
+.clip .meta input{width:64px;padding:5px 8px;font-size:12px}
+.clip .meta select{padding:5px 8px;font-size:12px}
+.iconbtn{background:none;border:none;color:var(--mute);font-size:17px;cursor:pointer;padding:3px 6px}
+.iconbtn:hover{color:var(--sun);filter:none}
+.empty{color:var(--mute);font-size:13px;text-align:center;padding:26px 10px;border:1px dashed var(--line);border-radius:8px;margin-top:12px}
+.hint{color:var(--mute);font-size:11.5px;margin-top:6px;line-height:1.5}
+.hint a{color:var(--sea)}
+.bar{height:5px;background:var(--ink);border-radius:3px;overflow:hidden;margin-top:10px}
+.bar div{height:100%;background:var(--sea);width:0;transition:width .2s}
+.status{font-size:12px;color:var(--mute);margin-top:8px;min-height:18px}
+.fields{display:grid;gap:11px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+#tracks{display:flex;flex-direction:column;gap:6px;margin-top:11px;max-height:230px;overflow-y:auto}
+.track{
+  display:grid;grid-template-columns:1fr auto;gap:9px;align-items:center;
+  background:var(--ink-3);border:1px solid var(--line);border-radius:6px;padding:8px 10px;
+}
+.track.on{border-color:var(--sea);box-shadow:0 0 0 2px rgba(79,140,255,.10)}
+.track b{display:block;font-size:12.5px;font-weight:500}
+.track span{font-size:11px;color:var(--mute)}
+.track button{padding:6px 11px;font-size:11.5px}
+
+input[type=range]{width:100%;accent-color:var(--sea)}
+
+/* scenario generator */
+.script{display:none;flex-direction:column;gap:6px;margin-top:2px}
+.sline{display:grid;grid-template-columns:52px 1fr;gap:8px;align-items:center}
+.sline span{font-size:11px;color:var(--mute);text-align:right;line-height:1.3}
+.sline input{padding:6px 9px;font-size:12px}
+.sline.head input{font-weight:700;border-color:var(--sun)}
+details{border-top:1px solid var(--line);padding-top:11px;margin-top:3px}
+summary{cursor:pointer;font-size:12px;color:var(--mute);list-style:none;user-select:none}
+summary::-webkit-details-marker{display:none}
+summary:before{content:'＋ ';color:var(--sea);font-weight:700}
+details[open] summary:before{content:'－ '}
+details .fields{margin-top:10px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>여행 홍보<br><em>영상 메이커</em></h1>
+  <div class="tag">로그인 없이 사진·음원을 찾고, 최대 1분 쇼츠로 내보냅니다</div>
+</header>
+
+<div class="wrap">
+<div class="grid">
+
+  <!-- LEFT: preview + clips -->
+  <div>
+    <div class="panel">
+      <h2>미리보기</h2>
+      <div id="stage"><canvas id="canvas" width="1280" height="720"></canvas></div>
+      <audio id="remoteAudio" crossorigin="anonymous" preload="auto" style="display:none"></audio>
+      <div class="controls">
+        <button id="play">재생</button>
+        <button id="export" class="ghost">영상 내보내기</button>
+        <button id="reset" class="ghost" title="모든 장면·설정을 초기화합니다" style="background:rgba(255,100,100,.08);border-color:rgba(255,100,100,.3);color:#ff6b6b">↺ 초기화</button>
+        <div id="result" class="result"></div>
+        <div class="time" id="total">0.0s <small>/ 최대 60s</small></div>
+      </div>
+      <div class="bar"><div id="prog"></div></div>
+      <div class="status" id="status"></div>
+    </div>
+
+    <div class="panel">
+      <h2>장면 순서</h2>
+      <div id="clips"></div>
+      <div class="empty" id="empty">아직 장면이 없습니다. 오른쪽에서 사진을 검색하거나 직접 올려보세요.</div>
+    </div>
+  </div>
+
+  <!-- RIGHT: sources + settings -->
+  <div>
+    <div class="panel">
+      <h2>주제로 시나리오 만들기</h2>
+      <div class="fields">
+        <div>
+          <label>영상 주제</label>
+          <input type="text" id="topic" placeholder="예: 여수 밤바다 감성 여행" value="여수 밤바다">
+        </div>
+        <div class="two">
+          <div>
+            <label>톤</label>
+            <select id="tone">
+              <option value="emo">감성적</option>
+              <option value="fun">활기찬</option>
+              <option value="info">정보 전달</option>
+              <option value="cine">시네마틱</option>
+            </select>
+          </div>
+          <div>
+            <label>장면 수</label>
+            <input type="number" id="sceneCount" value="6" min="2" max="30">
+          </div>
+        </div>
+        <div class="row">
+          <button id="genScript">시나리오 만들기</button>
+          <button class="ghost" id="genAll">사진까지 한 번에</button>
+        </div>
+        <div class="script" id="scriptBox"></div>
+        <div class="status" id="gstatus"></div>
+        <div class="hint">타이틀·자막·엔딩 문구를 한 번에 채웁니다. 장면이 이미 있으면 그 개수에 맞춰 씁니다. 여기서 바로 고쳐 쓸 수 있고, 장면을 더 추가하면 순서대로 자막이 들어갑니다.</div>
+
+        <details>
+          <summary>AI로 더 자연스럽게 쓰기 (선택)</summary>
+          <div class="fields">
+            <div>
+              <label>Anthropic API 키</label>
+              <input type="password" id="apiKey" placeholder="sk-ant-...">
+            </div>
+            <div>
+              <label>모델 이름</label>
+              <input type="text" id="apiModel" value="claude-sonnet-4-6">
+            </div>
+            <div class="hint">키를 넣으면 AI가 주제에 맞는 문구를 직접 씁니다. 비워두면 내장 문구 세트로 만듭니다. 키는 이 브라우저에만 저장되며, 파일을 더블클릭해 여는 대신 웹서버로 열어야 연결됩니다.</div>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>사진 검색 · 로그인 없음</h2>
+      <div class="fields">
+        <div class="row">
+          <div>
+            <label>검색어</label>
+            <input type="text" id="q" placeholder="Yeosu, Yeosu Ocean, Yeosu Night" value="Yeosu Korea">
+          </div>
+          <button id="search">검색</button><button class="ghost" id="testPhotos" type="button">연결 확인</button>
+        </div>
+      </div>
+      <div class="hint">한글로 입력해도 자동으로 영어로 바꿔 검색합니다(여수 밤바다 → Yeosu night sea). 바뀐 검색어가 칸에 남으니 직접 고칠 수 있습니다.</div>
+      <div class="results" id="results"></div>
+      <button class="ghost" id="morePhotos" style="width:100%;margin-top:10px;display:none;">사진 더 불러오기</button>
+    </div>
+
+    <div class="panel">
+      <h2>내 사진·영상 올리기</h2>
+      <input type="file" id="upload" accept="image/*,video/*" multiple style="font-size:12px;color:var(--mute)">
+      <div class="hint">사진과 영상을 함께 선택할 수 있습니다. 영상은 시작·끝 구간을 직접 조정할 수 있습니다.</div>
+    </div>
+
+    <div class="panel">
+      <h2>배경음악 · 로그인 없음</h2>
+      <div class="fields">
+        <div class="row">
+          <div>
+            <label>분위기 검색</label>
+            <input type="text" id="jq" placeholder="upbeat travel, cinematic" value="upbeat travel">
+          </div>
+          <button id="jsearch">검색</button><button class="ghost" id="testAudio" type="button">연결 확인</button>
+        </div>
+      </div>
+      <div class="hint">Openverse의 공개 라이선스 음원을 검색합니다. 별도 로그인이나 API 키가 필요하지 않습니다. 음원별 라이선스 조건은 최종 사용 전에 확인하세요.</div>
+      <div id="tracks"></div>
+      <button class="ghost" id="moreTracks" style="width:100%;margin-top:10px;display:none;">음원 더 불러오기</button>
+
+      <div style="border-top:1px solid var(--line);margin:15px 0 12px"></div>
+      <div id="synthPanel">
+        <label>인터넷 없이 음악 만들기</label>
+        <div class="row">
+          <div>
+            <select id="mood">
+              <option value="calm">잔잔한 배경</option>
+              <option value="bright">밝고 경쾌하게</option>
+              <option value="cine">시네마틱</option>
+            </select>
+          </div>
+          <button class="ghost" id="genMusic" type="button">만들기</button>
+        </div>
+        <div class="hint">브라우저가 직접 소리를 합성합니다. 검색이나 다운로드가 필요 없고, 저작권 걱정 없이 영상에 그대로 씁니다.</div>
+      </div>
+
+      <div style="border-top:1px solid var(--line);margin:15px 0 12px"></div>
+      <label>또는 내 음악 파일 올리기</label>
+      <input type="file" id="music" accept="audio/*" style="font-size:12px;color:var(--mute)">
+
+      <div class="two" style="margin-top:11px">
+        <div>
+          <label>볼륨</label>
+          <input type="number" id="vol" value="70" min="0" max="100">
+        </div>
+        <div>
+          <label>시작 지점(초)</label>
+          <input type="number" id="mstart" value="0" min="0" step="0.5">
+        </div>
+      </div>
+      <div class="status" id="mstatus"></div>
+    </div>
+
+    <div class="panel">
+      <h2>영상 필터 효과</h2>
+      <div class="fields">
+        <div><label>전체 영상 필터</label>
+          <select id="filter">
+            <option value="none">원본</option><option value="bright">밝고 선명하게</option>
+            <option value="warm">따뜻한 감성</option><option value="cool">시원한 바다</option>
+            <option value="vintage">빈티지</option><option value="cinematic">시네마틱</option>
+            <option value="bw">흑백</option><option value="dream">몽환적</option>
+          </select>
+        </div>
+        <div class="two"><div><label>밝기</label><input type="range" id="brightness" min="50" max="150" value="100"></div>
+        <div><label>대비</label><input type="range" id="contrast" min="50" max="160" value="100"></div></div>
+        <div class="two"><div><label>채도</label><input type="range" id="saturation" min="0" max="200" value="100"></div>
+        <div><label>흐림</label><input type="range" id="blur" min="0" max="8" value="0" step="0.5"></div></div>
+        <button class="ghost" id="resetFilter" type="button">필터 초기화</button>
+      </div>
+      <div class="hint">필터는 미리보기와 최종 영상에 동일하게 적용됩니다.</div>
+    </div>
+
+    <div class="panel">
+      <h2>영상 설정</h2>
+      <div class="fields">
+        <div>
+          <label>오프닝 타이틀</label>
+          <input type="text" id="title" placeholder="여수, 바다의 도시">
+        </div>
+        <div>
+          <label>엔딩 문구</label>
+          <input type="text" id="outro" placeholder="지금, 여수로">
+        </div>
+        <div class="two">
+          <div>
+            <label>기본 장면 길이(초)</label>
+            <input type="number" id="dur" value="1.5" min="0.5" max="60" step="0.5">
+          </div>
+          <div>
+            <label>화면 비율</label>
+            <select id="ratio">
+              <option value="9:16" selected>9:16 세로 (쇼츠/릴스)</option>
+              <option value="16:9">16:9 가로</option>
+              <option value="1:1">1:1 정사각</option>
+            </select>
+          </div>
+        </div>
+        <button class="ghost" id="autofit">60초에 맞춰 자동 배분</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+window.addEventListener('error', e => {
+  const s = $('status');
+  if(s) s.textContent = '프로그램 오류: ' + (e.message || '알 수 없는 오류');
+  console.error(e.error || e.message);
+});
+const cv = $('canvas'), cx = cv ? cv.getContext('2d') : null;
+let clips = [], audioBuf = null, audioCtx = null, remoteAudio = null, remoteAudioUrl = '', audioSource = null;
+let scenario = null;
+
+const TRANSITIONS = {
+  cut:'컷', fade:'페이드', slide:'슬라이드', zoom:'줌인', flash:'플래시'
+};
+
+/* ---------- ratio ---------- */
+function applyRatio(){
+  const r = $('ratio').value;
+  const map = {'16:9':[1280,720],'9:16':[720,1280],'1:1':[900,900]};
+  const [w,h] = map[r];
+  cv.width = w; cv.height = h;
+  $('stage').style.aspectRatio = r.replace(':','/');
+  draw(0);
+}
+$('ratio').onchange = applyRatio;
+
+/* ---------- photo sources ---------- */
+/* 한 곳이 막혀도 다음 경로로 넘어간다. 실패하면 이유를 그대로 보여준다. */
+let photoPage = 0;
+let lastPhotoSource = '';
+let photoQueryUsed = '';   // 결과가 나온 검색어. 더 불러오기에서 그대로 쓴다
+
+/* fetch 를 부모 창으로 중계하는 샌드박스에서는 AbortSignal 같은 객체를 넘기면
+   구조화 복제에 실패한다. 그래서 옵션 없이 URL 만 넘기고, 시간 제한은 경주로 건다. */
+function withTimeout(p, ms, what){
+  let timer;
+  const limit = new Promise((_, rej) => {
+    timer = setTimeout(() => rej(new Error('응답 없음(시간 초과)')), ms);
+  });
+  return Promise.race([p, limit]).finally(() => clearTimeout(timer));
+}
+
+async function jget(url, ms){
+  try{
+    const r = await withTimeout(fetch(url), ms || 6000);
+    if(!r.ok) throw new Error('서버 응답 ' + r.status);
+    return await withTimeout(r.json(), 6000);
+  }catch(e){
+    const m = e.message || '';
+    if(/시간 초과/.test(m)) throw e;
+    if(e.name === 'TypeError' || /failed to fetch|networkerror|load failed|network request/i.test(m)){
+      throw new Error('브라우저가 요청을 차단함(CORS)');
+    }
+    if(/could not be cloned|postMessage/i.test(m)){
+      throw new Error('이 화면에서는 외부 요청이 중계되지 않습니다');
+    }
+    throw e;
+  }
+}
+
+const isPhotoName = n => /\.(jpe?g|png|webp)$/i.test(n || '');
+
+async function srcCommonsApi(q, limit, offset){
+  // origin=* 는 인코딩하지 않고 그대로 붙여야 익명 CORS가 허용된다
+  const url = 'https://commons.wikimedia.org/w/api.php?action=query&generator=search'
+    + '&gsrnamespace=6&gsrsearch=' + encodeURIComponent(q)
+    + '&gsrlimit=' + limit + (offset ? '&gsroffset=' + offset : '')
+    + '&prop=imageinfo&iiprop=url&iiurlwidth=1280&format=json&formatversion=2&origin=*';
+  const d = await jget(url);
+  const pages = d.query?.pages || [];
+  return pages
+    .slice()
+    .sort((a, b) => (a.index || 0) - (b.index || 0))
+    .map(p => {
+      const info = (p.imageinfo || [])[0];
+      const name = (p.title || '').replace(/^File:/, '');
+      if(!info || !isPhotoName(name)) return null;
+      return {url: info.thumburl || info.url, credit: name};
+    })
+    .filter(Boolean);
+}
+srcCommonsApi.label = '위키미디어 커먼즈';
+
+async function srcCommonsRest(q, limit){
+  const url = 'https://api.wikimedia.org/core/v1/commons/search/page?q='
+    + encodeURIComponent(q) + '&limit=' + Math.min(limit, 50);
+  const d = await jget(url);
+  return (d.pages || []).map(p => {
+    const t = p.thumbnail && p.thumbnail.url;
+    const name = (p.title || '').replace(/^File:/, '');
+    if(!t || !isPhotoName(name)) return null;
+    let u = t.startsWith('//') ? 'https:' + t : t;
+    u = u.replace(/\/\d+px-/, '/1280px-');   // 썸네일을 큰 판으로 올린다
+    return {url: u, credit: name};
+  }).filter(Boolean);
+}
+srcCommonsRest.label = '커먼즈 REST';
+
+const OPENVERSE_HOSTS = ['https://api.openverse.org', 'https://api.openverse.engineering'];
+
+async function srcOpenverse(q, limit, offset){
+  const page = Math.floor((offset || 0) / limit) + 1;
+  const path = '/v1/images/?q=' + encodeURIComponent(q) + '&page_size=' + limit + '&page=' + page;
+
+  let d = null, lastErr = null;
+  for(const host of OPENVERSE_HOSTS){          // 한쪽 도메인이 막히는 망이 있다
+    try{ d = await jget(host + path, 5000); break; }
+    catch(e){ lastErr = e; }
+  }
+  if(!d) throw lastErr || new Error('연결 실패');
+
+  return (d.results || []).map(r => ({
+    url: r.thumbnail || r.url,
+    credit: [r.title, r.creator].filter(Boolean).join(' · ') || 'Openverse'
+  })).filter(x => x.url);
+}
+srcOpenverse.label = 'Openverse';
+
+/* CSP 가 fetch(connect-src)를 막아도 <script> 태그는 통과하는 경우가 있다.
+   JSONP 는 그때를 위한 마지막 우회로다. */
+function jsonp(url, ms){
+  return new Promise((resolve, reject) => {
+    const cb = 'wcb_' + Math.random().toString(36).slice(2);
+    const el = document.createElement('script');
+    let done = false;
+    const cleanup = () => {
+      done = true;
+      clearTimeout(timer);
+      try{ delete window[cb]; }catch(e){ window[cb] = undefined; }
+      if(el.parentNode) el.parentNode.removeChild(el);
+    };
+    const timer = setTimeout(() => {
+      if(!done){ cleanup(); reject(new Error('응답 없음(시간 초과)')); }
+    }, ms || 6000);
+    window[cb] = data => { if(!done){ cleanup(); resolve(data); } };
+    el.onerror = () => { if(!done){ cleanup(); reject(new Error('스크립트도 차단됨(CSP)')); } };
+    el.src = url + '&format=json&callback=' + cb;
+    document.head.appendChild(el);
+  });
+}
+
+async function srcCommonsJsonp(q, limit, offset){
+  const url = 'https://commons.wikimedia.org/w/api.php?action=query&generator=search'
+    + '&gsrnamespace=6&gsrsearch=' + encodeURIComponent(q)
+    + '&gsrlimit=' + limit + (offset ? '&gsroffset=' + offset : '')
+    + '&prop=imageinfo&iiprop=url&iiurlwidth=1280&formatversion=2';
+  const d = await jsonp(url);
+  const pages = d.query?.pages || [];
+  return pages.slice().sort((a, b) => (a.index || 0) - (b.index || 0)).map(p => {
+    const info = (p.imageinfo || [])[0];
+    const name = (p.title || '').replace(/^File:/, '');
+    if(!info || !isPhotoName(name)) return null;
+    return {url: info.thumburl || info.url, credit: name};
+  }).filter(Boolean);
+}
+srcCommonsJsonp.label = '커먼즈 JSONP';
+
+const PHOTO_SOURCES = [srcCommonsApi, srcCommonsRest, srcOpenverse];
+
+/* 계속 실패하는 경로는 잠시 쉬게 둔다. 다만 일시적인 문제일 수 있으므로
+   영구히 빼지 않고 몇 분 뒤 다시 시도한다. */
+const srcFailCount = new Map();
+const srcRestUntil = new Map();
+const SKIP_AFTER = 2;
+const REST_MS = 3 * 60 * 1000;
+
+function resetSourceHealth(){ srcFailCount.clear(); srcRestUntil.clear(); }
+function sourceResting(src){ return (srcRestUntil.get(src.label) || 0) > Date.now(); }
+
+async function photoSearch(q, limit, offset, onTry){
+  let active = PHOTO_SOURCES.filter(s => !sourceResting(s));
+  if(!active.length){ resetSourceHealth(); active = PHOTO_SOURCES.slice(); }
+
+  if(onTry) onTry('사진 서버 ' + active.length + '곳에 동시에 요청');
+
+  // 순차로 돌리면 막힌 환경에서 대기가 겹친다. 동시에 던지고 우선순위대로 고른다.
+  const settled = await Promise.all(active.map(async src => {
+    try{
+      const items = await src(q, limit, offset || 0);
+      srcFailCount.set(src.label, 0);
+      srcRestUntil.delete(src.label);
+      return {src, items};
+    }catch(e){
+      const n = (srcFailCount.get(src.label) || 0) + 1;
+      srcFailCount.set(src.label, n);
+      if(n >= SKIP_AFTER) srcRestUntil.set(src.label, Date.now() + REST_MS);
+      return {src, items: [], err: e.message};
+    }
+  }));
+
+  const errors = settled.map(r => r.src.label + ': ' + (r.err || (r.items.length ? r.items.length + '장' : '결과 없음')));
+  const win = settled.find(r => r.items.length);
+  if(win){
+    lastPhotoSource = win.src.label;
+    return {items: win.items, source: win.src.label, errors};
+  }
+
+  // fetch 가 전부 막혔다면 script 태그로 한 번 더 시도한다
+  const allBlocked = settled.every(r => r.err);
+  if(allBlocked){
+    if(onTry) onTry('다른 방식(JSONP)으로 재시도');
+    try{
+      const items = await srcCommonsJsonp(q, limit, offset || 0);
+      if(items.length){
+        lastPhotoSource = srcCommonsJsonp.label;
+        return {items, source: srcCommonsJsonp.label, errors};
+      }
+      errors.push(srcCommonsJsonp.label + ': 결과 없음');
+    }catch(e){
+      errors.push(srcCommonsJsonp.label + ': ' + e.message);
+    }
+  }
+
+  return {items: [], source: null, errors};
+}
+
+/* 커먼즈 검색은 모든 단어를 만족하는 파일만 준다(AND).
+   단어가 많을수록 0건이 되므로, 결과가 없으면 검색어를 줄여가며 다시 찾는다. */
+async function photoSearchLadder(candidates, limit, offset, onTry){
+  const tried = [];
+  let lastErrors = [];
+  for(const cand of candidates.filter(Boolean).filter((v, i, a) => a.indexOf(v) === i)){
+    tried.push(cand);
+    const r = await photoSearch(cand, limit, offset, onTry);
+    if(r.items.length) return Object.assign(r, {query: cand, tried});
+    lastErrors = r.errors;
+    if(r.errors.some(e => /CORS|시간 초과|중계되지/.test(e))) break;   // 막힌 거면 줄여도 소용없다
+  }
+  return {items: [], source: null, errors: lastErrors, query: null, tried};
+}
+
+/* 단어를 뒤에서부터 덜어낸 후보들 */
+function shorterQueries(q){
+  const w = String(q || '').split(/\s+/).filter(Boolean);
+  const out = [w.join(' ')];
+  if(w.length > 3) out.push(w.slice(0, 3).join(' '));
+  if(w.length > 2) out.push(w.slice(0, 2).join(' '));
+  if(w.length > 1) out.push(w[0]);
+  return out;
+}
+
+/* 자동 채우기에서 쓰는 얇은 래퍼 */
+async function fetchPhotos(query, limit){
+  const r = await photoSearch(query, limit || 8, 0);
+  return r.items;
+}
+
+let offlineNotified = false;
+
+function highlightOffline(){
+  if(offlineNotified) return;
+  offlineNotified = true;
+
+  const mark = (el, text) => {
+    const p = el && el.closest('.panel');
+    if(!p) return;
+    p.style.borderColor = 'var(--sun)';
+    p.style.boxShadow = '0 0 0 2px rgba(255,184,0,.18)';
+    const note = document.createElement('div');
+    note.className = 'hint';
+    note.style.color = 'var(--paper)';
+    note.textContent = text;
+    p.appendChild(note);
+  };
+
+  mark($('upload'), '온라인 검색이 막힌 상태입니다. 여기서 사진을 올리면 자막·전환·필터·내보내기는 그대로 작동합니다.');
+  mark($('genMusic'), '온라인 음원도 막혔습니다. "인터넷 없이 음악 만들기"는 브라우저가 직접 합성하므로 그대로 쓸 수 있습니다.');
+
+  const sp = $('synthPanel');
+  if(sp){
+    sp.style.background = 'var(--ink-3)';
+    sp.style.border = '1px solid var(--sun)';
+    sp.style.borderRadius = '8px';
+    sp.style.padding = '11px';
+  }
+  $('morePhotos').style.display = 'none';
+  $('moreTracks').style.display = 'none';
+}
+
+function offlineMode(detail){
+  const how = location.protocol === 'file:'
+    ? '이 파일이 있는 폴더에서 python3 -m http.server 를 실행하고 localhost:8000 으로 여세요.'
+    : '이 화면이 외부 연결을 막고 있습니다. 파일을 내려받아 로컬 웹서버로 여세요.';
+  setStatus('온라인 검색이 막혔습니다(' + detail + '). ' + how
+    + ' 사진을 직접 올리고 음악은 아래에서 만들면 영상 제작은 그대로 됩니다.');
+  highlightOffline();
+}
+
+function showPhotos(items, append){
+  const box = $('results');
+  if(!append) box.innerHTML = '';
+  items.forEach(p => {
+    const im = new Image();
+    im.crossOrigin = 'anonymous';
+    im.src = p.url;
+    im.alt = p.credit || '';
+    im.title = p.credit || '';
+    im.onclick = () => addClip(p.url, p.credit || '');
+    box.appendChild(im);
+  });
+}
+
+async function searchPhotos(reset){
+  if(reset === undefined) reset = true;
+  const typed = $('q').value.trim();
+  if(!typed){ setStatus('검색어를 입력하세요.'); return; }
+
+  if(reset){ photoPage = 0; photoQueryUsed = ''; $('results').innerHTML = ''; }
+  $('search').disabled = true;
+
+  let q = typed;
+  if(HANGUL.test(typed)){
+    setStatus('한글 검색어를 영어로 바꾸는 중…');
+    q = await toEnglishQuery(typed);
+    if(q && q !== typed){
+      $('q').value = q;      // 무엇으로 검색했는지 그대로 보여준다
+      qTouched = true;
+    }
+  }
+  setStatus('사진 검색 중…');
+
+  try{
+    const cands = (!reset && photoQueryUsed) ? [photoQueryUsed] : shorterQueries(q);
+    const r = await photoSearchLadder(cands, 24, photoPage * 24, name => setStatus(name + ' 검색 중…'));
+    if(r.query) photoQueryUsed = r.query;
+
+    if(!r.items.length){
+      $('morePhotos').style.display = 'none';
+      const blocked = r.errors.some(e => /CORS|시간 초과|중계되지 않습니다/.test(e));
+      if(blocked){
+        offlineMode(r.errors.join(' / '));
+      }else{
+        setStatus('"' + r.tried.join('", "') + '" 로 찾아봤지만 결과가 없습니다.'
+          + (q !== typed ? ' (' + typed + ' 를 자동 변환한 검색어입니다.)' : '')
+          + ' 지명만 남기거나 다른 낱말로 바꿔보세요.');
+      }
+      return;
+    }
+
+    showPhotos(r.items, !reset);
+    $('morePhotos').style.display = r.items.length >= 12 ? 'block' : 'none';
+
+    let how = '';
+    if(q !== typed) how += ' · "' + typed + '" → "' + q + '"';
+    if(r.query && r.query !== q) how += ' · 결과가 없어 "' + r.query + '" 로 줄여 검색';
+    setStatus((reset ? '' : '추가 ') + r.items.length + '장 · ' + r.source + how
+      + ' · 사진을 눌러 장면에 추가하세요.');
+  }catch(e){
+    console.error(e);
+    setStatus('사진 검색 중 오류: ' + e.message);
+  }finally{
+    $('search').disabled = false;
+  }
+}
+
+$('search').onclick = () => searchPhotos(true);
+$('morePhotos').onclick = () => { photoPage += 1; searchPhotos(false); };
+
+$('testPhotos').onclick = async () => {
+  resetSourceHealth();
+  setStatus('사진 서버를 확인하는 중…');
+  const lines = [];
+  for(const src of PHOTO_SOURCES.concat([srcCommonsJsonp])){
+    try{
+      const items = await src('sea', 3, 0);
+      lines.push(src.label + ' 정상(' + items.length + '장)');
+    }catch(e){
+      lines.push(src.label + ' 실패 - ' + e.message);
+    }
+  }
+  const ok = lines.some(l => l.includes('정상'));
+  let tail = '';
+  if(!ok){
+    if(lines.some(l => /중계되지 않습니다/.test(l))){
+      tail = ' — 이 미리보기 화면은 외부 요청을 막습니다. 파일을 내려받아 웹서버로 여세요.';
+    }else if(location.protocol === 'file:'){
+      tail = ' — 파일을 직접 열어서 막혔습니다. 폴더에서 python3 -m http.server 실행 후 localhost:8000 으로 여세요.';
+    }else{
+      tail = ' — 네트워크나 확장 프로그램이 요청을 막고 있는지 확인하세요.';
+    }
+  }
+  const okCount = lines.filter(l => l.includes('정상')).length;
+  setStatus(lines.join(' / ') + tail
+    + (ok ? ' — ' + okCount + '곳 정상입니다. 검색어를 입력하고 검색하세요.' : ''));
+};
+
+$('q').addEventListener('keydown', e => {
+  if(e.key === 'Enter') searchPhotos(true);
+});
+
+$('upload').onchange = async e => {
+  const files = [...e.target.files];
+  e.target.value = '';
+  for(const f of files){
+    const url = URL.createObjectURL(f);
+    if(f.type.startsWith('video/')){
+      await addVideoClip(url, f.name);
+    } else {
+      await addClip(url, '');
+    }
+  }
+};
+
+$('music').onchange = async e => {
+  const f = e.target.files[0]; if(!f) return;
+  try{
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    audioBuf = await audioCtx.decodeAudioData(await f.arrayBuffer());
+    if(remoteAudio){
+      remoteAudio.pause();
+      remoteAudio.removeAttribute('src');
+      remoteAudio.load();
+    }
+    audioSource = null;
+    remoteAudioUrl = '';
+    selectedTrack = null;
+    try{ localStorage.removeItem('yeosu_selected_track'); }catch(e){}
+    musicCredit = '';
+    mstat('내 음원 준비됨 · ' + audioBuf.duration.toFixed(1) + '초');
+  }catch(err){
+    console.error(err);
+    mstat('음원 파일을 읽지 못했습니다.');
+  }
+};
+
+/* ---------- login-free audio search ---------- */
+let musicCredit = '';
+let audioPage = 1;
+let audioResults = [];
+let selectedTrack = null;
+
+function saveSelectedTrack(){
+  try{
+    if(selectedTrack) localStorage.setItem('yeosu_selected_track', JSON.stringify(selectedTrack));
+  }catch(e){}
+}
+
+function restoreSelectedTrack(){
+  try{
+    const saved = JSON.parse(localStorage.getItem('yeosu_selected_track') || 'null');
+    if(saved && saved.url){
+      selectedTrack = saved;
+      remoteAudio = $('remoteAudio');
+      remoteAudio.crossOrigin = 'anonymous';
+      remoteAudio.src = saved.url;
+      remoteAudio.load();
+      musicCredit = [saved.title, saved.creator].filter(Boolean).join(' — ');
+      mstat('이전 선택 복원됨 · ' + musicCredit);
+    }
+  }catch(e){}
+}
+
+function mstat(m){ $('mstatus').textContent = m; }
+
+function renderTracks(list, append=false){
+  const box = $('tracks');
+  if(!append) box.innerHTML = '';
+
+  list.forEach(t => {
+    const el = document.createElement('div');
+    el.className = 'track';
+    el.innerHTML = `
+      <div>
+        <b></b>
+        <span></span>
+        <small style="display:block;color:var(--mute);margin-top:3px;"></small>
+      </div>
+      <button>선택</button>`;
+
+    el.querySelector('b').textContent = t.title || 'Untitled';
+    el.querySelector('span').textContent = t.creator || 'Internet Archive';
+    el.querySelector('small').textContent = '공개 아카이브 · 원본 페이지에서 사용 조건 확인';
+
+    el.querySelector('button').onclick = () => useArchiveTrack(t, el);
+    box.appendChild(el);
+  });
+}
+
+async function searchTracks(reset=true){
+  const typed = $('jq').value.trim();
+  if(!typed){ mstat('검색어를 입력하세요.'); return; }
+
+  let q = typed;
+  if(HANGUL.test(typed)){
+    mstat('한글 검색어를 영어로 바꾸는 중…');
+    q = await toEnglishQuery(typed);
+    if(q && q !== typed) $('jq').value = q;
+  }
+
+  if(reset){
+    audioPage = 1;
+    audioResults = [];
+    $('tracks').innerHTML = '';
+  }
+
+  mstat('음원 검색 중…');
+
+  try{
+    // Internet Archive metadata search: anonymous, no API key, browser-friendly.
+    // Build the query URL explicitly. This avoids the invalid `fl[]` object
+    // key that stopped the entire JavaScript file from loading in the previous version.
+    const url = 'https://archive.org/advancedsearch.php?q='
+      + encodeURIComponent('(title:(' + q + ') OR creator:(' + q + ')) AND mediatype:audio')
+      + '&fl[]=identifier&fl[]=title&fl[]=creator&rows=20&page='
+      + encodeURIComponent(audioPage) + '&output=json';
+
+    const data = await jget(url);
+    const docs = data.response?.docs || [];
+
+    if(!docs.length && reset){
+      mstat('검색 결과가 없습니다. 영어 검색어(예: travel, cinematic, ambient, jazz)를 사용해보세요.');
+      $('moreTracks').style.display = 'none';
+      return;
+    }
+
+    const mapped = docs.map(d => ({
+      id: d.identifier,
+      title: d.title || d.identifier,
+      creator: Array.isArray(d.creator) ? d.creator.join(', ') : (d.creator || 'Internet Archive')
+    }));
+
+    audioResults.push(...mapped);
+    renderTracks(mapped, !reset);
+
+    const total = data.response?.numFound || 0;
+    $('moreTracks').style.display = audioResults.length < total ? 'block' : 'none';
+    mstat((reset ? '' : '추가 ') + mapped.length + '개 음원 앨범/자료를 찾았습니다. "선택"을 누르면 재생 가능한 파일을 찾습니다.');
+  }catch(e){
+    console.error(e);
+    mstat('온라인 음원 검색이 막혔습니다(' + (e.message || '연결 실패') + '). 위의 "인터넷 없이 음악 만들기"를 쓰거나 MP3 파일을 올려주세요.');
+    highlightOffline();
+    showFallbackTracks(reset);
+  }
+}
+
+function showFallbackTracks(reset=true){
+  // Reliable direct MP3 samples hosted by Wikimedia Commons.
+  const fallback = [
+    {
+      title:'무료 샘플 음원 1',
+      creator:'Wikimedia Commons',
+      url:'https://upload.wikimedia.org/wikipedia/commons/transcoded/4/4e/Bach_-_Brandenburg_Concerto_No.3_-_1._Allegro.ogg/Bach_-_Brandenburg_Concerto_No.3_-_1._Allegro.ogg.mp3'
+    },
+    {
+      title:'무료 샘플 음원 2',
+      creator:'Wikimedia Commons',
+      url:'https://upload.wikimedia.org/wikipedia/commons/transcoded/9/9f/Beethoven_-_Fur_Elise.ogg/Beethoven_-_Fur_Elise.ogg.mp3'
+    }
+  ];
+
+  const box = $('tracks');
+  if(reset) box.innerHTML = '';
+  fallback.forEach(t => {
+    const el = document.createElement('div');
+    el.className = 'track';
+    el.innerHTML = `<div><b></b><span></span></div><button>선택</button>`;
+    el.querySelector('b').textContent = t.title;
+    el.querySelector('span').textContent = t.creator;
+    el.querySelector('button').onclick = () => setupRemoteAudio(t.url, t.title, t.creator, el);
+    box.appendChild(el);
+  });
+  $('moreTracks').style.display = 'none';
+}
+
+async function useArchiveTrack(t, el){
+  const btn = el.querySelector('button');
+  btn.disabled = true;
+  btn.textContent = '파일 찾는 중…';
+  mstat('선택한 자료에서 재생 가능한 음원 파일을 찾는 중…');
+
+  try{
+    const meta = await jget('https://archive.org/metadata/' + encodeURIComponent(t.id));
+    const files = (meta.files || []).filter(f =>
+      f.name && /\.(mp3|ogg|wav|m4a|flac)$/i.test(f.name) && !/(_spectrogram|_itemimage)/i.test(f.name)
+    );
+
+    if(!files.length) throw new Error('재생 가능한 음원 파일이 없습니다.');
+
+    const f = files.find(x => /\.(mp3|ogg)$/i.test(x.name)) || files[0];
+    const directUrl = 'https://archive.org/download/' + encodeURIComponent(t.id) + '/' + encodeURIComponent(f.name);
+
+    setupRemoteAudio(directUrl, t.title, t.creator, el);
+    btn.textContent = '선택됨';
+    document.querySelectorAll('.track button').forEach(b => {
+      if(b !== btn && b.textContent !== '파일 찾는 중…') b.textContent = '선택';
+    });
+  }catch(e){
+    console.error(e);
+    mstat('이 자료에서 바로 재생할 수 있는 음원을 찾지 못했습니다. 다른 항목을 선택하세요.');
+    btn.textContent = '다시 선택';
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+$('jsearch').onclick = () => searchTracks(true);
+$('testAudio').onclick = async () => {
+  mstat('음원 서버 연결 확인 중…');
+  try{
+    await jget('https://archive.org/advancedsearch.php?q=mediatype%3Aaudio&fl[]=identifier&rows=1&page=1&output=json');
+    mstat('음원 서버 연결 정상입니다. 검색어를 입력하고 검색하세요.');
+  }catch(e){
+    mstat('음원 서버에 연결하지 못했습니다 - ' + e.message + '. 아래에서 MP3 파일을 직접 올릴 수 있습니다.');
+  }
+};
+$('moreTracks').onclick = () => { audioPage += 1; searchTracks(false); };
+
+$('jq').addEventListener('keydown', e => {
+  if(e.key === 'Enter') searchTracks(true);
+});
+
+// Restore the previously selected online track after a page reload.
+restoreSelectedTrack();
+
+function setupRemoteAudio(url, title, creator, el){
+  if(!url){
+    mstat('이 음원의 직접 재생 주소가 없습니다.');
+    return;
+  }
+
+  // Save first so even if the browser reloads after a permission prompt,
+  // the selected track can be restored.
+  selectedTrack = {url, title, creator};
+  saveSelectedTrack();
+
+  remoteAudio = $('remoteAudio');
+  remoteAudio.pause();
+  remoteAudio.crossOrigin = 'anonymous';
+  remoteAudio.src = url;
+  remoteAudio.currentTime = 0;
+  remoteAudioUrl = url;
+
+  musicCredit = [title, creator].filter(Boolean).join(' — ');
+  document.querySelectorAll('.track').forEach(x => x.classList.remove('on'));
+  if(el) el.classList.add('on');
+
+  remoteAudio.onerror = () => {
+    mstat('선택한 음원을 브라우저에서 재생하지 못했습니다. 다른 음원을 선택하거나 MP3 파일을 올려주세요.');
+  };
+
+  remoteAudio.onloadedmetadata = () => {
+    mstat('선택됨 · ' + musicCredit + (remoteAudio.duration ? ' · ' + fmt(remoteAudio.duration) : ''));
+  };
+
+  // Important: do not call play() here. Automatic playback can trigger a
+  // browser permission/gesture flow and make the app appear to reset.
+  mstat('음원 선택 완료 · 영상 미리보기 또는 내보낼 때 사용됩니다.');
+}
+
+function fmt(s){
+  s = +s || 0;
+  return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
+}
+
+/* ---------- offline music synthesis ---------- */
+/* 외부 연결이 막힌 곳에서도 배경음악을 쓸 수 있게 브라우저가 직접 합성한다. */
+const MOODS = {
+  calm:   {bpm: 72,  chords: [[60,64,67],[57,60,64],[65,69,72],[55,59,62]], pad:'sine',     arp:'sine',     arpGain:0.055, kick:false, cutoff:2600},
+  bright: {bpm: 112, chords: [[60,64,67],[67,71,74],[57,60,64],[65,69,72]], pad:'triangle', arp:'triangle', arpGain:0.085, kick:true,  cutoff:5200},
+  cine:   {bpm: 84,  chords: [[57,60,64],[65,69,72],[60,64,67],[55,59,62]], pad:'sawtooth', arp:'sine',     arpGain:0.045, kick:false, cutoff:1800}
+};
+
+const midiHz = n => 440 * Math.pow(2, (n - 69) / 12);
+
+function tone(ctx, dest, freq, start, dur, type, peak){
+  if(dur <= 0.02) return;
+  const o = ctx.createOscillator();
+  o.type = type;
+  o.frequency.value = freq;
+  const g = ctx.createGain();
+  const atk = Math.min(0.25, dur * 0.3);
+  const rel = Math.min(0.5, dur * 0.5);
+  g.gain.setValueAtTime(0.0001, start);
+  g.gain.linearRampToValueAtTime(peak, start + atk);
+  g.gain.setValueAtTime(peak, start + Math.max(atk, dur - rel));
+  g.gain.linearRampToValueAtTime(0.0001, start + dur);
+  o.connect(g);
+  g.connect(dest);
+  o.start(start);
+  o.stop(start + dur + 0.02);
+}
+
+function thump(ctx, dest, start){
+  const o = ctx.createOscillator();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(120, start);
+  o.frequency.exponentialRampToValueAtTime(45, start + 0.12);
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.16, start);
+  g.gain.exponentialRampToValueAtTime(0.0001, start + 0.18);
+  o.connect(g);
+  g.connect(dest);
+  o.start(start);
+  o.stop(start + 0.2);
+}
+
+async function renderMusic(moodKey, seconds){
+  const OC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+  if(!OC) throw new Error('이 브라우저는 음악 합성을 지원하지 않습니다.');
+
+  const m = MOODS[moodKey] || MOODS.calm;
+  const sr = 44100;
+  const dur = Math.max(8, Math.min(180, seconds || 70));
+  const ctx = new OC(2, Math.ceil(sr * dur), sr);
+
+  const master = ctx.createGain();
+  master.gain.value = 1.7;
+  const lp = ctx.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.value = m.cutoff;
+  lp.connect(master);
+  master.connect(ctx.destination);
+
+  const beat = 60 / m.bpm;
+  const barLen = beat * 4;
+  const bars = Math.ceil(dur / barLen);
+
+  for(let bar = 0; bar < bars; bar++){
+    const t0 = bar * barLen;
+    if(t0 >= dur) break;
+    const chord = m.chords[bar % m.chords.length];
+    const span = Math.min(barLen, dur - t0);
+
+    // 패드: 코드를 길게 깔아준다
+    chord.forEach(n => tone(ctx, lp, midiHz(n), t0, span * 0.98, m.pad, 0.05));
+    // 베이스: 근음 한 옥타브 아래
+    tone(ctx, lp, midiHz(chord[0] - 24), t0, span * 0.9, 'sine', 0.11);
+    // 아르페지오: 8분음표로 코드음을 훑는다
+    for(let i = 0; i < 8; i++){
+      const t = t0 + i * (beat / 2);
+      if(t >= dur) break;
+      const n = chord[i % chord.length] + (i >= 4 ? 12 : 0);
+      tone(ctx, lp, midiHz(n), t, beat * 0.45, m.arp, m.arpGain);
+    }
+    if(m.kick){
+      for(let b = 0; b < 4; b++){
+        const t = t0 + b * beat;
+        if(t < dur) thump(ctx, lp, t);
+      }
+    }
+  }
+
+  // 앞뒤 페이드
+  master.gain.setValueAtTime(0.0001, 0);
+  master.gain.linearRampToValueAtTime(1.7, 1.2);
+  master.gain.setValueAtTime(1.7, Math.max(1.3, dur - 1.5));
+  master.gain.linearRampToValueAtTime(0.0001, dur);
+
+  return await ctx.startRendering();
+}
+
+$('genMusic').onclick = async () => {
+  const btn = $('genMusic');
+  btn.disabled = true;
+  btn.textContent = '만드는 중…';
+  mstat('음악을 합성하는 중…');
+  try{
+    const want = Math.max(20, Math.min(90, totalTime() + 8));
+    audioBuf = await renderMusic($('mood').value, want);
+    if(remoteAudio){
+      try{ remoteAudio.pause(); remoteAudio.removeAttribute('src'); remoteAudio.load(); }catch(e){}
+    }
+    audioSource = null;
+    remoteAudioUrl = '';
+    selectedTrack = null;
+    try{ localStorage.removeItem('yeosu_selected_track'); }catch(e){}
+    musicCredit = '브라우저에서 만든 음악 · ' + $('mood').selectedOptions[0].textContent;
+    document.querySelectorAll('.track').forEach(x => x.classList.remove('on'));
+    mstat('음악 준비됨 · ' + audioBuf.duration.toFixed(1) + '초 · ' + musicCredit + ' · 재생을 눌러 들어보세요.');
+  }catch(e){
+    console.error(e);
+    mstat('음악을 만들지 못했습니다 - ' + e.message);
+  }finally{
+    btn.disabled = false;
+    btn.textContent = '만들기';
+  }
+};
+
+/* ---------- filters ---------- */
+const PRESETS = {
+  none:      {b:100, c:100, s:100, extra:''},
+  bright:    {b:112, c:112, s:112, extra:''},
+  warm:      {b:104, c:104, s:118, extra:'sepia(22%) hue-rotate(-8deg)'},
+  cool:      {b:102, c:108, s:112, extra:'hue-rotate(14deg)'},
+  vintage:   {b:104, c:92,  s:78,  extra:'sepia(45%)'},
+  cinematic: {b:94,  c:132, s:88,  extra:'contrast(108%)'},
+  bw:        {b:104, c:118, s:0,   extra:'grayscale(100%)'},
+  dream:     {b:110, c:88,  s:120, extra:'blur(0.6px) saturate(112%)'}
+};
+
+let filterLocked = false;   // true while a preset is driving the sliders
+
+function currentFilter(){
+  const p = PRESETS[$('filter').value] || PRESETS.none;
+  const b = +$('brightness').value;
+  const c = +$('contrast').value;
+  const s = +$('saturation').value;
+  const bl = +$('blur').value;
+  let f = `brightness(${b}%) contrast(${c}%) saturate(${s}%)`;
+  if(p.extra) f += ' ' + p.extra;
+  if(bl > 0)  f += ` blur(${bl}px)`;
+  return f === 'brightness(100%) contrast(100%) saturate(100%)' ? 'none' : f;
+}
+
+function setupFilterControls(){
+  if(setupFilterControls.done) return;
+  setupFilterControls.done = true;
+
+  $('filter').onchange = () => {
+    const p = PRESETS[$('filter').value] || PRESETS.none;
+    filterLocked = true;
+    $('brightness').value = p.b;
+    $('contrast').value   = p.c;
+    $('saturation').value = p.s;
+    filterLocked = false;
+    redrawPreview();
+  };
+
+  ['brightness','contrast','saturation','blur'].forEach(id => {
+    $(id).oninput = () => {
+      if(!filterLocked) redrawPreview();
+    };
+  });
+
+  $('resetFilter').onclick = () => {
+    $('filter').value = 'none';
+    $('brightness').value = 100;
+    $('contrast').value   = 100;
+    $('saturation').value = 100;
+    $('blur').value       = 0;
+    redrawPreview();
+    setStatus('필터를 원본으로 되돌렸습니다.');
+  };
+}
+
+function redrawPreview(){
+  if(playing) return;          // playback loop already redraws every frame
+  draw(previewTime());
+}
+
+function previewTime(){
+  // show the first real photo so filter changes are visible immediately
+  return ($('title').value ? 1.6 : 0) + 0.5;
+}
+
+/* ---------- clips ---------- */
+function addClipAsync(url, credit){
+  return new Promise(resolve => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const s = scenario ? scenario.scenes[clips.length] : null;
+      clips.push({
+        img, url, credit,
+        text: s ? s.caption : '',
+        dur: +$('dur').value,
+        tr: s && s.tr ? s.tr : 'fade'
+      });
+      setupFilterControls();
+      render();
+      resolve(true);
+    };
+    img.onerror = () => resolve(false);
+    img.src = url;
+  });
+}
+
+async function addClip(url, credit){
+  const ok = await addClipAsync(url, credit);
+  if(ok) setStatus((credit ? credit + ' · ' : '') + '사진이 장면에 추가되었습니다.');
+  else setStatus('선택한 이미지를 불러오지 못했습니다. 다른 사진을 선택해보세요.');
+}
+
+/* ---------- video clip support ---------- */
+function isVideoClip(c){ return c.type === 'video'; }
+
+function clipDuration(c){
+  return isVideoClip(c) ? (c.trimEnd - c.trimStart) : c.dur;
+}
+
+function addVideoClipAsync(url, credit, vid){
+  return new Promise(resolve => {
+    vid = vid || document.createElement('video');
+    vid.crossOrigin = 'anonymous';
+    vid.preload = 'metadata';
+    vid.muted = true;
+    vid.playsInline = true;
+    const onMeta = () => {
+      vid.removeEventListener('loadedmetadata', onMeta);
+      const sc = scenario ? scenario.scenes[clips.length] : null;
+      const nativeDur = isFinite(vid.duration) ? vid.duration : 5;
+      clips.push({
+        type: 'video', vid, url, credit,
+        text: sc ? sc.caption : '',
+        tr: sc && sc.tr ? sc.tr : 'fade',
+        dur: Math.min(nativeDur, 30),
+        trimStart: 0,
+        trimEnd: Math.min(nativeDur, 30)
+      });
+      setupFilterControls();
+      render();
+      resolve(true);
+    };
+    vid.addEventListener('loadedmetadata', onMeta);
+    vid.addEventListener('error', () => resolve(false));
+    vid.src = url;
+  });
+}
+
+async function addVideoClip(url, credit, vidEl){
+  const ok = await addVideoClipAsync(url, credit, vidEl);
+  if(ok) setStatus((credit ? credit + ' · ' : '') + '영상이 장면에 추가되었습니다.');
+  else setStatus('영상을 불러오지 못했습니다. 브라우저가 지원하는 형식인지 확인하세요.');
+}
+
+function fmtSec(v){ return Math.floor(v/60) + ':' + String(Math.floor(v%60)).padStart(2,'0'); }
+
+function render(){
+  const box = $('clips'); box.innerHTML = '';
+  $('empty').style.display = clips.length ? 'none' : 'block';
+  clips.forEach((c,i) => {
+    const isVid = isVideoClip(c);
+    const dur = clipDuration(c);
+    const el = document.createElement('div');
+    el.className = 'clip';
+
+    const thumb = document.createElement(isVid ? 'video' : 'img');
+    if(isVid){ thumb.className='thumb'; thumb.muted=true; thumb.playsInline=true; thumb.preload='metadata'; }
+    thumb.src = c.url;
+
+    const typeTag = document.createElement('span');
+    typeTag.className = 'clip-type ' + (isVid ? 'video' : 'photo');
+    typeTag.textContent = isVid ? '🎬 영상' : '🖼 사진';
+
+    const cap = document.createElement('input');
+    cap.type = 'text';
+    cap.placeholder = '자막을 입력하세요';
+    cap.value = c.text;
+    cap.style.flex = '1';
+    cap.oninput = e => {
+      c.text = e.target.value;
+      if(scenario && scenario.scenes[i]) scenario.scenes[i].caption = c.text;
+    };
+
+    const header = document.createElement('div');
+    header.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:4px';
+    header.appendChild(typeTag);
+    header.appendChild(cap);
+
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+
+    if(!isVid){
+      const durIn = document.createElement('input');
+      durIn.type = 'number'; durIn.min = '0.5'; durIn.max = '20'; durIn.step = '0.5';
+      durIn.value = c.dur; durIn.title = '장면 길이(초)';
+      durIn.oninput = e => { c.dur = Math.max(0.5, +e.target.value || 2); updateTotal(); draw(0); };
+      meta.appendChild(durIn);
+    }
+
+    const trSel = document.createElement('select');
+    trSel.title = '전환 효과';
+    [['fade','페이드'],['zoom','줌인'],['slide','슬라이드'],['flash','플래시']].forEach(([v,l]) => {
+      const o = document.createElement('option');
+      o.value = v; o.textContent = l;
+      if(c.tr === v) o.selected = true;
+      trSel.appendChild(o);
+    });
+    trSel.onchange = e => { c.tr = e.target.value; };
+    meta.appendChild(trSel);
+
+    const info = document.createElement('div');
+    info.appendChild(header);
+    info.appendChild(meta);
+
+    if(isVid){
+      const trimDiv = document.createElement('div');
+      trimDiv.className = 'trim';
+
+      const makeSlider = (label, initVal, min, max) => {
+        const wrap = document.createElement('div');
+        const lbl = document.createElement('label');
+        const valSpan = document.createElement('span');
+        valSpan.textContent = fmtSec(initVal);
+        lbl.appendChild(document.createTextNode(label + ' '));
+        lbl.appendChild(valSpan);
+        const sl = document.createElement('input');
+        sl.type = 'range'; sl.min = min; sl.max = max; sl.step = '0.1'; sl.value = initVal;
+        wrap.appendChild(lbl);
+        wrap.appendChild(sl);
+        return {wrap, sl, valSpan};
+      };
+
+      const nativeDur = c.vid.duration || c.trimEnd;
+      const {wrap:sw, sl:sSlider, valSpan:sVal} = makeSlider('시작', c.trimStart, 0, nativeDur.toFixed(2));
+      const {wrap:ew, sl:eSlider, valSpan:eVal} = makeSlider('끝', c.trimEnd, 0, nativeDur.toFixed(2));
+      trimDiv.appendChild(sw);
+      trimDiv.appendChild(ew);
+
+      const durLabel = document.createElement('div');
+      durLabel.className = 'trim-nums';
+      const durSpan = document.createElement('span');
+      durSpan.textContent = '길이 ' + dur.toFixed(1) + 's';
+      durLabel.appendChild(durSpan);
+
+      const update = () => {
+        c.dur = clipDuration(c);
+        durSpan.textContent = '길이 ' + c.dur.toFixed(1) + 's';
+        updateTotal(); draw(0);
+      };
+      sSlider.oninput = () => {
+        c.trimStart = Math.min(+sSlider.value, c.trimEnd - 0.1);
+        sSlider.value = c.trimStart;
+        sVal.textContent = fmtSec(c.trimStart);
+        update();
+      };
+      eSlider.oninput = () => {
+        c.trimEnd = Math.max(+eSlider.value, c.trimStart + 0.1);
+        eSlider.value = c.trimEnd;
+        eVal.textContent = fmtSec(c.trimEnd);
+        update();
+      };
+
+      info.appendChild(trimDiv);
+      info.appendChild(durLabel);
+    }
+
+    const btns = document.createElement('div');
+    btns.style.cssText = 'display:flex;flex-direction:column;gap:4px';
+    [['↑','up'],['↓','dn'],['×','del']].forEach(([lbl,a]) => {
+      const b = document.createElement('button');
+      b.className = 'iconbtn'; b.textContent = lbl;
+      b.setAttribute('data-a', a);
+      b.onclick = () => {
+        if(a==='del') clips.splice(i,1);
+        else if(a==='up' && i>0) [clips[i],clips[i-1]]=[clips[i-1],clips[i]];
+        else if(a==='dn' && i<clips.length-1) [clips[i],clips[i+1]]=[clips[i+1],clips[i]];
+        if(clips.length >= 2) $('sceneCount').value = clips.length;
+        render(); draw(0); updateTotal();
+      };
+      btns.appendChild(b);
+    });
+
+    // 드래그 핸들
+    const handle = document.createElement('div');
+    handle.className = 'drag-handle';
+    handle.textContent = '⋮⋮';
+    handle.title = '드래그해서 순서 변경';
+
+    el.appendChild(handle);
+    el.appendChild(thumb);
+    el.appendChild(info);
+    el.appendChild(btns);
+
+    // ── Drag & Drop (마우스 + 터치 공통) ──────────────────────────
+    el.setAttribute('draggable', 'true');
+    el.dataset.idx = i;
+
+    el.addEventListener('dragstart', e => {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', String(i));
+      requestAnimationFrame(() => el.classList.add('dragging'));
+    });
+    el.addEventListener('dragend', () => {
+      el.classList.remove('dragging');
+      box.querySelectorAll('.clip').forEach(c => c.classList.remove('drag-over'));
+    });
+    el.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      box.querySelectorAll('.clip').forEach(c => c.classList.remove('drag-over'));
+      el.classList.add('drag-over');
+    });
+    el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+    el.addEventListener('drop', e => {
+      e.preventDefault();
+      el.classList.remove('drag-over');
+      const from = +e.dataTransfer.getData('text/plain');
+      const to   = i;
+      if(from === to) return;
+      const [moved] = clips.splice(from, 1);
+      clips.splice(to, 0, moved);
+      if(clips.length >= 2) $('sceneCount').value = clips.length;
+      render(); draw(0); updateTotal();
+    });
+
+    // ── 터치 드래그 (모바일) ──────────────────────────────────────
+    let touchDragIdx = null, ghost = null;
+    handle.addEventListener('touchstart', e => {
+      e.preventDefault();
+      touchDragIdx = i;
+      ghost = el.cloneNode(true);
+      ghost.style.cssText = 'position:fixed;opacity:.6;pointer-events:none;z-index:9999;'
+        + 'width:' + el.offsetWidth + 'px;left:-9999px;top:0;';
+      document.body.appendChild(ghost);
+      el.classList.add('dragging');
+    }, {passive:false});
+
+    handle.addEventListener('touchmove', e => {
+      if(touchDragIdx === null) return;
+      e.preventDefault();
+      const t = e.touches[0];
+      ghost.style.left = (t.clientX - 40) + 'px';
+      ghost.style.top  = (t.clientY - 30) + 'px';
+      // 어떤 clip 위에 있는지 찾기
+      box.querySelectorAll('.clip').forEach(c => c.classList.remove('drag-over'));
+      const over = document.elementFromPoint(t.clientX, t.clientY);
+      const overClip = over && over.closest('.clip');
+      if(overClip && overClip !== el) overClip.classList.add('drag-over');
+    }, {passive:false});
+
+    handle.addEventListener('touchend', e => {
+      if(touchDragIdx === null) return;
+      if(ghost) { ghost.remove(); ghost = null; }
+      el.classList.remove('dragging');
+      box.querySelectorAll('.clip').forEach(c => c.classList.remove('drag-over'));
+      const t = e.changedTouches[0];
+      const over = document.elementFromPoint(t.clientX, t.clientY);
+      const overClip = over && over.closest('.clip[data-idx]');
+      if(overClip){
+        const to = +overClip.dataset.idx;
+        if(to !== touchDragIdx){
+          const [moved] = clips.splice(touchDragIdx, 1);
+          clips.splice(to, 0, moved);
+          if(clips.length >= 2) $('sceneCount').value = clips.length;
+          render(); draw(0); updateTotal();
+        }
+      }
+      touchDragIdx = null;
+    });
+
+    box.appendChild(el);
+
+    if(isVid){
+      thumb.addEventListener('loadedmetadata', () => {
+        try{ thumb.currentTime = c.trimStart + (c.trimEnd - c.trimStart) * 0.15; }catch(e){}
+      });
+    }
+  });
+  updateTotal();
+  draw(0);
+}
+
+$('autofit').onclick = () => {
+  if(!clips.length) return;
+  const extra = ($('title').value?1.6:0) + ($('outro').value?1.8:0);
+  const each = Math.max(.5, Math.round((60-extra)/clips.length*10)/10);
+  clips.forEach(c => c.dur = each);
+  render();
+};
+
+function updateTotal(){
+  const t = totalTime();
+  $('total').innerHTML = t.toFixed(1) + 's <small>/ 최대 60s</small>';
+  $('total').style.color = t <= 60 ? 'var(--sea)' : '#E25555';
+  if(t > 60) setStatus('영상 길이가 1분을 초과했습니다. 장면 길이를 줄여주세요.');
+}
+function totalTime(){
+  return clips.reduce((s,c)=>s+c.dur,0)
+    + ($('title').value?1.6:0) + ($('outro').value?1.8:0);
+}
+$('title').oninput = $('outro').oninput = () => {
+  if(scenario){
+    scenario.title = $('title').value;
+    scenario.outro = $('outro').value;
+    const inputs = $('scriptBox').querySelectorAll('.sline input');
+    if(inputs.length){
+      inputs[0].value = scenario.title;
+      inputs[inputs.length-1].value = scenario.outro;
+    }
+  }
+  updateTotal();
+};
+
+/* ---------- drawing ---------- */
+function cover(img,t){
+  const W=cv.width, H=cv.height;
+  const z = 1 + t*0.09;                      // slow push-in on every shot
+  const s = Math.max(W/img.width, H/img.height) * z;
+  const w = img.width*s, h = img.height*s;
+  cx.drawImage(img, (W-w)/2, (H-h)/2, w, h);
+}
+
+function caption(text, alpha){
+  if(!text) return;
+  const W=cv.width, H=cv.height;
+  const pad = W*0.06;
+  const size = Math.round(W*0.052);
+  cx.save();
+  cx.globalAlpha = alpha;
+  const g = cx.createLinearGradient(0,H*0.62,0,H);
+  g.addColorStop(0,'rgba(12,22,24,0)');
+  g.addColorStop(1,'rgba(12,22,24,0.82)');
+  cx.fillStyle=g; cx.fillRect(0,H*0.62,W,H*0.38);
+  cx.fillStyle='#F5C518';
+  cx.fillRect(pad, H-pad-size*1.55, W*0.055, 5);
+  let fs = size;
+  cx.font = `700 ${fs}px 'Noto Sans KR',sans-serif`;
+  const maxW = W - pad*2;
+  while(cx.measureText(text).width > maxW && fs > size*0.5){
+    fs -= 1;
+    cx.font = `700 ${fs}px 'Noto Sans KR',sans-serif`;
+  }
+  cx.fillStyle='#EAF0EF';
+  cx.textAlign='left';
+  cx.textBaseline='alphabetic';
+  cx.fillText(text, pad, H-pad);
+  cx.restore();
+}
+
+function card(text, alpha, sub){
+  const W=cv.width, H=cv.height;
+  cx.fillStyle='#0C1618'; cx.fillRect(0,0,W,H);
+  cx.save(); cx.globalAlpha=alpha;
+  cx.textAlign='center'; cx.textBaseline='middle';
+  const base = Math.round(W*0.085);
+  let fs = base;
+  cx.font = `700 ${fs}px 'Noto Sans KR',sans-serif`;
+  const maxW = W*0.84;
+  while(cx.measureText(text).width > maxW && fs > base*0.45){
+    fs -= 1;
+    cx.font = `700 ${fs}px 'Noto Sans KR',sans-serif`;
+  }
+  cx.fillStyle='#EAF0EF';
+  cx.fillText(text, W/2, H/2 - (sub?W*0.02:0));
+  cx.fillStyle='#F5C518';
+  cx.fillRect(W/2 - W*0.05, H/2 + W*0.075, W*0.1, 5);
+  cx.restore();
+}
+
+function draw(time){
+  if(!cx) return;
+  const W=cv.width, H=cv.height;
+  cx.fillStyle='#0C1618'; cx.fillRect(0,0,W,H);
+  const T = $('title').value, O = $('outro').value;
+  const tLen = T?1.6:0, oLen = O?1.8:0;
+
+  if(T && time < tLen){
+    const a = time<0.35 ? time/0.35 : (time>tLen-0.35 ? (tLen-time)/0.35 : 1);
+    card(T, Math.max(0,Math.min(1,a)));
+    return;
+  }
+  let t = time - tLen;
+  for(let i=0;i<clips.length;i++){
+    const c = clips[i];
+    if(t < c.dur){
+      const p = t/c.dur, fade = 0.4;
+      cx.save();
+      cx.filter = currentFilter();
+      if(c.tr==='fade')  cx.globalAlpha = t<fade ? t/fade : 1;
+      if(c.tr==='zoom' && t<fade){ const k=1+(1-t/fade)*0.14;
+        cx.translate(W/2,H/2); cx.scale(k,k); cx.translate(-W/2,-H/2); }
+      if(c.tr==='slide' && t<fade) cx.translate(W*(1-t/fade)*0.4, 0);
+      if(isVideoClip(c)){
+        const vid = c.vid;
+        const elapsed = t * (c.trimEnd - c.trimStart) / c.dur;
+        const target = c.trimStart + elapsed;
+        // 재생 중이 아닐 때(미리보기 정지)는 currentTime 으로 프레임을 표시
+        if(!playing && Math.abs(vid.currentTime - target) > 0.15){
+          try{ vid.currentTime = target; }catch(e){}
+        }
+        try{ cx.drawImage(vid, 0, 0, W, H); }catch(e){}
+      } else {
+        cover(c.img, t);
+      }
+      cx.filter = 'none';
+      cx.restore();
+      if(c.tr==='flash' && t<0.16){
+        cx.fillStyle='rgba(255,255,255,'+(1-t/0.16)*0.8+')'; cx.fillRect(0,0,W,H);
+      }
+      caption(c.text, t<0.3 ? t/0.3 : 1);
+      return;
+    }
+    t -= c.dur;
+  }
+  if(O && t < oLen){
+    const a = t<0.4 ? t/0.4 : 1;
+    card(O, Math.min(1,a));
+  }
+}
+
+/* ---------- playback ---------- */
+let raf = null, playing = false;
+function playLoop(start, onEnd){
+  const total = totalTime();
+  const titleLen = $('title').value ? 1.6 : 0;
+  let activeVid = null;
+
+  const syncVideo = (t) => {
+    let at = t - titleLen;
+    let newVid = null, targetTime = 0, targetDur = 0;
+    for(let i = 0; i < clips.length; i++){
+      const c = clips[i];
+      const dur = clipDuration(c);
+      if(at < dur){
+        if(isVideoClip(c)){
+          newVid = c.vid;
+          targetTime = c.trimStart + at;
+          targetDur = dur;
+        }
+        break;
+      }
+      at -= dur;
+    }
+
+    if(newVid !== activeVid){
+      if(activeVid){ try{ activeVid.pause(); }catch(e){} }
+      activeVid = newVid;
+      if(activeVid){
+        try{ activeVid.currentTime = targetTime; }catch(e){}
+        activeVid.play().catch(()=>{});
+      }
+    }
+  };
+
+  const step = () => {
+    const t = (performance.now() - start) / 1000;
+    syncVideo(t);
+    draw(t);
+    $('prog').style.width = Math.min(100, t / total * 100) + '%';
+    if(t < total) raf = requestAnimationFrame(step);
+    else {
+      if(activeVid){ try{ activeVid.pause(); }catch(e){} }
+      playing = false; $('play').textContent = '재생';
+      onEnd && onEnd();
+    }
+  };
+  step();
+}
+let previewAudio = null;
+function stopPreviewAudio(){
+  if(previewAudio){ try{ previewAudio.src.stop(); }catch(e){} previewAudio = null; }
+  if(remoteAudio){ try{ remoteAudio.pause(); }catch(e){} }
+  clips.filter(isVideoClip).forEach(c => { try{ c.vid.pause(); }catch(e){} });
+}
+
+$('play').onclick = () => {
+  if(!clips.length){ setStatus('장면을 먼저 추가하세요.'); return; }
+  if(playing){
+    cancelAnimationFrame(raf); playing=false; $('play').textContent='재생';
+    stopPreviewAudio(); return;
+  }
+  playing = true; $('play').textContent='정지';
+  stopPreviewAudio();
+  previewAudio = buildAudio();
+  if(!audioBuf) setStatus('배경음악 파일을 넣으면 재생 중에도 함께 들립니다.');
+  playLoop(performance.now(), () => {
+    if(previewAudio?.src){ try{ previewAudio.src.stop(); }catch(e){} }
+    if(remoteAudio){ try{ remoteAudio.pause(); }catch(e){} }
+    previewAudio = null;
+  });
+};
+
+/* ---------- export ---------- */
+function buildAudio(){
+  audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+
+  const gain = audioCtx.createGain();
+  gain.gain.value = (+$('vol').value||70)/100;
+
+  const dest = audioCtx.createMediaStreamDestination();
+  gain.connect(dest);
+  gain.connect(audioCtx.destination);
+
+  const total = totalTime();
+
+  if(audioBuf){
+    const src = audioCtx.createBufferSource();
+    src.buffer = audioBuf;
+    src.connect(gain);
+    const offset = Math.max(0, +$('mstart').value || 0);
+    src.start(0, offset);
+    gain.gain.setValueAtTime(gain.gain.value, audioCtx.currentTime + Math.max(0,total-1.2));
+    gain.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + total);
+    return {stream:dest.stream, src, gain};
+  }
+
+  if(remoteAudio && remoteAudio.src){
+    try{
+      if(!audioSource){
+        audioSource = audioCtx.createMediaElementSource(remoteAudio);
+      }
+      audioSource.connect(gain);
+      remoteAudio.currentTime = Math.max(0, +$('mstart').value || 0);
+      remoteAudio.play().catch(() => {});
+      gain.gain.setValueAtTime(gain.gain.value, audioCtx.currentTime + Math.max(0,total-1.2));
+      gain.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + total);
+      return {stream:dest.stream, el:remoteAudio, gain};
+    }catch(e){
+      console.error(e);
+      mstat('온라인 음원을 영상에 연결하지 못했습니다. 내 MP3 파일을 사용해보세요.');
+      return null;
+    }
+  }
+  return null;
+}
+
+/* 사파리는 WebM 녹화를 지원하지 않는다. 브라우저가 실제로 받아주는 형식을 찾아 쓰고,
+   확장자와 Blob 타입도 그 형식에 맞춘다. */
+const isSmallScreen = () => Math.min(screen.width, screen.height) <= 640
+  || /iPhone|iPod|Android.*Mobile/i.test(navigator.userAgent);
+
+function pickRecordingMime(){
+  const candidates = [
+    'video/mp4;codecs=avc1.42E01E,mp4a.40.2',   // 사파리·아이폰
+    'video/mp4;codecs=h264,aac',
+    'video/mp4',
+    'video/webm;codecs=vp9,opus',
+    'video/webm;codecs=vp8,opus',
+    'video/webm'
+  ];
+  if(typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported) return '';
+  return candidates.find(m => MediaRecorder.isTypeSupported(m)) || '';
+}
+
+function extFor(mime){ return /mp4/i.test(mime || '') ? 'mp4' : 'webm'; }
+
+function recordingSupport(){
+  if(typeof MediaRecorder === 'undefined') return 'MediaRecorder 미지원';
+  if(!cv.captureStream) return 'canvas.captureStream 미지원';
+  return '';
+}
+
+let lastVideo = null;   // {blob, name}
+
+function showResult(blob, name){
+  lastVideo = {blob, name};
+  const box = $('result');
+  box.innerHTML = '';
+  box.style.display = 'flex';
+
+  const dl = document.createElement('button');
+  dl.textContent = '내려받기';
+  dl.onclick = () => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+  };
+  box.appendChild(dl);
+
+  // 아이폰에서는 공유 시트를 거쳐야 사진 앱에 저장된다
+  let file = null;
+  try{ file = new File([blob], name, {type: blob.type}); }catch(e){}
+  if(file && navigator.canShare && navigator.canShare({files: [file]})){
+    const sh = document.createElement('button');
+    sh.className = 'ghost';
+    sh.textContent = '공유 · 사진에 저장';
+    sh.onclick = async () => {
+      try{ await navigator.share({files: [file], title: $('title').value || '홍보 영상'}); }
+      catch(e){ if(e.name !== 'AbortError') setStatus('공유를 열지 못했습니다 - ' + e.message); }
+    };
+    box.appendChild(sh);
+  }
+
+  const v = document.createElement('video');
+  v.src = URL.createObjectURL(blob);
+  v.controls = true;
+  v.playsInline = true;
+  v.style.cssText = 'width:100%;border-radius:8px;margin-top:8px';
+  box.appendChild(v);
+}
+
+$('export').onclick = () => {
+  if(!clips.length){ setStatus('장면을 먼저 추가하세요.'); return; }
+  if(totalTime() > 60.05){ setStatus('최대 1분까지만 내보낼 수 있습니다. 현재 장면 길이를 줄여주세요.'); return; }
+
+  const missing = recordingSupport();
+  if(missing){
+    setStatus('이 브라우저는 영상 녹화를 지원하지 않습니다(' + missing
+      + '). 아이폰은 iOS 16.4 이상 사파리, 안드로이드는 크롬을 쓰세요.');
+    return;
+  }
+  if(playing){ cancelAnimationFrame(raf); playing=false; $('play').textContent='재생'; }
+
+  const stream = cv.captureStream(30);
+  const audio = buildAudio();
+  if(audio) audio.stream.getAudioTracks().forEach(t => stream.addTrack(t));
+
+  const mime = pickRecordingMime();
+  const opts = {videoBitsPerSecond: isSmallScreen() ? 4_000_000 : 6_000_000};
+  if(mime) opts.mimeType = mime;
+
+  let rec;
+  try{
+    rec = new MediaRecorder(stream, opts);
+  }catch(e){
+    try{ rec = new MediaRecorder(stream); }
+    catch(e2){ setStatus('녹화를 시작하지 못했습니다 - ' + e2.message); return; }
+  }
+
+  const chunks = [];
+  rec.ondataavailable = e => e.data.size && chunks.push(e.data);
+  rec.onerror = e => {
+    setStatus('녹화 중 오류가 발생했습니다 - ' + ((e.error && e.error.name) || '알 수 없음'));
+    $('export').disabled = false; $('export').textContent = '영상 내보내기';
+  };
+  rec.onstop = () => {
+    const type = rec.mimeType || mime || 'video/webm';
+    const ext = extFor(type);
+    const blob = new Blob(chunks, {type});
+    if(!blob.size){
+      setStatus('녹화된 데이터가 없습니다. 다시 시도해 주세요.');
+    }else{
+      showResult(blob, 'promo-' + Date.now() + '.' + ext);
+      setStatus('완료 · ' + ext.toUpperCase() + ' · ' + (blob.size / 1048576).toFixed(1) + 'MB'
+        + (navigator.canShare ? ' · 아래에서 내려받거나 사진 앱에 저장하세요.' : ' · 아래에서 내려받으세요.'));
+    }
+    $('export').disabled = false; $('export').textContent = '영상 내보내기';
+  };
+
+  let wake = null;
+  if(navigator.wakeLock){
+    navigator.wakeLock.request('screen').then(w => { wake = w; }).catch(() => {});
+  }
+  const releaseWake = () => { if(wake){ try{ wake.release(); }catch(e){} wake = null; } };
+  const prevStop = rec.onstop;
+  rec.onstop = () => { releaseWake(); prevStop(); };
+
+  $('result').style.display = 'none';
+  $('export').disabled = true; $('export').textContent = '녹화 중…';
+  setStatus('녹화 중입니다. 화면을 끄거나 다른 앱으로 넘어가지 마세요.');
+  rec.start();
+  playing = true; $('play').textContent = '정지';
+  playLoop(performance.now(), () => {
+    if(audio?.src) try{ audio.src.stop(); }catch(e){}
+    if(audio?.el) try{ audio.el.pause(); }catch(e){}
+    setTimeout(() => { try{ rec.stop(); }catch(e){} }, 300);
+  });
+};
+
+function setStatus(m){ $('status').textContent = m; }
+
+/* ---------- scenario generator ---------- */
+function gstat(m){ $('gstatus').textContent = m; }
+
+/* Each scene has a role. Roles carry an English keyword so photo search
+   still works when the topic is written in Korean. */
+/* 장면 역할. 배열 순서가 그대로 이야기 흐름이다.
+   영어 키워드는 주제가 한글이어도 사진 검색이 되게 하기 위한 것. */
+const ROLES = {
+  open:     {name:'오프닝', kw:'landmark',    tr:'fade'},
+  arrive:   {name:'도착',   kw:'station',     tr:'slide'},
+  wide:     {name:'풍경',   kw:'panorama',    tr:'zoom'},
+  sea:      {name:'바다',   kw:'beach',       tr:'zoom'},
+  nature:   {name:'자연',   kw:'mountain',    tr:'fade'},
+  street:   {name:'골목',   kw:'street',      tr:'slide'},
+  detail:   {name:'디테일', kw:'architecture',tr:'fade'},
+  culture:  {name:'문화',   kw:'temple',      tr:'fade'},
+  life:     {name:'사람',   kw:'market',      tr:'slide'},
+  food:     {name:'먹거리', kw:'food',        tr:'fade'},
+  cafe:     {name:'카페',   kw:'cafe',        tr:'fade'},
+  activity: {name:'체험',   kw:'boat',        tr:'flash'},
+  sunset:   {name:'노을',   kw:'sunset',      tr:'zoom'},
+  night:    {name:'야경',   kw:'night',       tr:'fade'},
+  close:    {name:'마무리', kw:'scenery',     tr:'fade'}
+};
+const MIDDLE = ['arrive','wide','sea','nature','street','detail','culture','life','food','cafe','activity','sunset','night'];
+
+const LINES = {
+  emo: {
+    title:  ['{t}에서 보낸 하루','{t}, 그리고 우리','천천히 걷는 {t}','{t}의 계절'],
+    outro:  ['지금, {t}로','{t}에서 만나요','다시 {t}','오래 기억할 이름'],
+    open:   ['{t}에 도착했습니다','{t}의 첫 인상','그날의 {t}'],
+    arrive: ['길 위에서 시작됩니다','짐을 내려놓는 순간','드디어 도착했습니다'],
+    wide:   ['천천히 걸어도 좋은 곳','시선이 오래 머무는 자리','숨을 크게 들이쉬면'],
+    sea:    ['파도 소리가 먼저 반깁니다','바다는 늘 그 자리에','물빛이 마음을 씻어냅니다'],
+    nature: ['초록이 가득한 길','바람이 지나가는 자리','나무 사이로 든 빛'],
+    street: ['골목마다 다른 표정','오래된 길의 온기','느린 걸음이 어울립니다'],
+    detail: ['작은 것들이 오래 남습니다','사소한 장면 하나','무심히 지나칠 뻔한'],
+    culture:['시간이 쌓인 자리','오래 지켜온 것들','조용히 머물다 갑니다'],
+    life:   ['이곳의 하루가 흐릅니다','사람이 있어 따뜻한 곳','누군가의 평범한 오후'],
+    food:   ['맛으로 기억되는 여행','한 그릇의 위로','여기서만 만나는 맛'],
+    cafe:   ['잠시 쉬어가는 자리','창밖을 오래 보게 됩니다','커피 한 잔의 여유'],
+    activity:['오늘은 조금 용감하게','처음 해보는 일','몸이 먼저 기억합니다'],
+    sunset: ['하루가 저물어갑니다','빛이 가장 예쁜 시간','노을이 전부인 순간'],
+    night:  ['불빛이 하나둘 켜집니다','밤이 더 다정한 곳','어둠 속에서 빛나는'],
+    close:  ['다시 오고 싶은 곳','기억은 오래 남습니다','또 만나요, {t}'],
+    filler: ['오래 담아두고 싶은 장면','말없이 바라보게 됩니다','문득 마음이 놓입니다',
+             '이 순간만은 천천히','여기 있어 다행입니다','눈에 오래 남습니다',
+             '괜히 걸음이 느려집니다','아무것도 아닌 시간이 좋습니다']
+  },
+  fun: {
+    title:  ['{t} 지금 출발!','오늘의 목적지, {t}','{t} 털어보기','{t} 하루 코스'],
+    outro:  ['지금, {t}로!','{t} 저장 필수','다음 여행지는 여기','{t}에서 만나요!'],
+    open:   ['{t} 도착 완료','오늘은 여기입니다','일단 가봤습니다'],
+    arrive: ['드디어 왔습니다','출발부터 신납니다','짐 풀고 바로 출발'],
+    wide:   ['이 뷰 실화인가요','여기가 바로 그곳','사진 각 나옵니다'],
+    sea:    ['바다부터 보고 갑니다','물빛 좀 보세요','파도 소리 켜세요'],
+    nature: ['공기가 다릅니다','초록 충전 완료','여기서 숨 좀 쉬고'],
+    street: ['골목 구경 재밌습니다','여기 분위기 좋아요','한 바퀴 돌아봅니다'],
+    detail: ['디테일까지 완벽','이건 놓치면 손해','여기 포인트 여기!'],
+    culture:['역사도 챙겨갑니다','생각보다 볼 게 많음','알고 보면 더 재밌음'],
+    life:   ['분위기 최고','사람 구경도 재미','활기가 넘칩니다'],
+    food:   ['안 먹으면 후회','이건 꼭 드세요','맛집 인정합니다'],
+    cafe:   ['당 충전 타임','커피 맛집 발견','잠깐 앉았다 갑니다'],
+    activity:['이건 꼭 해보세요','스릴 있습니다','생각보다 쉬워요'],
+    sunset: ['노을 놓치지 마세요','이 시간대 강추','하늘색이 미쳤습니다'],
+    night:  ['밤이 더 예쁩니다','야경 맛집','불빛 장난 아님'],
+    close:  ['{t} 어떠셨나요','저장하고 떠나세요','지금, {t}로!'],
+    filler: ['여기도 좋습니다','이런 것도 있어요','한 컷 더 갑니다',
+             '놓치기 아까움','기대 이상입니다','오길 잘했습니다',
+             '이 각도 추천','다들 여기서 찍더라고요']
+  },
+  info: {
+    title:  ['{t} 여행 가이드','{t} 한눈에 보기','{t} 핵심 코스','{t} 당일 코스'],
+    outro:  ['자세한 정보는 공식 안내에서','즐거운 {t} 여행 되세요','{t} 여행 준비 끝','코스 정보 더 보기'],
+    open:   ['{t} 여행 안내','{t} 주요 코스입니다','출발 전 확인하세요'],
+    arrive: ['접근성이 좋습니다','대중교통으로 갈 수 있습니다','주차 공간이 있습니다'],
+    wide:   ['대표 명소부터 둘러봅니다','도보 이동도 충분합니다','전망 포인트입니다'],
+    sea:    ['해안 산책로가 있습니다','바다 조망 구간입니다','날씨를 미리 확인하세요'],
+    nature: ['산책로가 정비돼 있습니다','편한 신발을 권합니다','봄가을이 좋습니다'],
+    street: ['상점이 모여 있습니다','둘러보기 좋습니다','주말에는 붐빕니다'],
+    detail: ['놓치기 쉬운 볼거리','가까이서 보면 더 좋습니다','함께 보면 좋은 곳'],
+    culture:['입장료를 확인하세요','휴관일이 있습니다','해설 프로그램이 있습니다'],
+    life:   ['현지 분위기를 느껴보세요','평일 방문을 추천합니다','오전이 한산합니다'],
+    food:   ['지역 대표 먹거리','식사는 이 근처에서','미리 예약하면 편합니다'],
+    cafe:   ['쉬어갈 곳이 많습니다','전망 좋은 자리가 있습니다','영업시간을 확인하세요'],
+    activity:['예약이 필요합니다','소요 시간은 약 한 시간','연령 제한을 확인하세요'],
+    sunset: ['일몰 시간을 확인하세요','이 시간대가 붐빕니다','전망대에서 보기 좋습니다'],
+    night:  ['야간 조명은 저녁부터','주변이 어두우니 주의하세요','막차 시간을 확인하세요'],
+    close:  ['반나절이면 충분합니다','대중교통으로도 갈 수 있습니다','즐거운 {t} 여행 되세요'],
+    filler: ['자세한 정보는 공식 안내 참고','계절에 따라 달라집니다','현장 상황을 확인하세요',
+             '지도를 미리 받아두세요','편의시설이 있습니다','동선을 짧게 잡으세요',
+             '입장 마감을 확인하세요','우천 시 운영이 달라집니다']
+  },
+  cine: {
+    title:  ['{t}','{t}, 그 여름','{t}의 시간','기록: {t}'],
+    outro:  ['{t}','다시, 이곳에서','여정은 계속된다','끝, 그리고 시작'],
+    open:   ['{t}','그곳에서 시작된다','이야기가 열린다'],
+    arrive: ['길은 이어진다','첫 발을 내딛다','문이 열린다'],
+    wide:   ['풍경이 말을 건넨다','시간이 느려지는 곳','지평선 너머'],
+    sea:    ['바다는 오래 기억한다','파도가 밀려온다','물결 위의 하루'],
+    nature: ['숲은 숨을 쉰다','바람이 지난다','초록의 시간'],
+    street: ['길이 품은 이야기','오래된 벽 앞에서','발소리가 남는다'],
+    detail: ['작은 흔적들','빛과 그림자','머무는 시선'],
+    culture:['남겨진 것들','시간이 새긴 자리','기억은 돌에 새겨진다'],
+    life:   ['저마다의 하루','삶은 계속된다','익숙한 얼굴들'],
+    food:   ['온기가 담긴 한 끼','손끝에서 완성된 맛','나눔의 시간'],
+    cafe:   ['잠시 멈춘다','창가의 오후','숨을 고른다'],
+    activity:['몸이 기억한다','경계를 넘는다','멈추지 않는다'],
+    sunset: ['빛이 저문다','가장 붉은 순간','하루가 기운다'],
+    night:  ['어둠이 내려앉는다','불빛이 깨어난다','밤이 시작된다'],
+    close:  ['그리고 남은 것','다시, 이곳에서','{t}'],
+    filler: ['침묵이 흐른다','무엇도 서두르지 않는다','장면은 이어진다',
+             '기억이 스친다','남겨진 온기','여정의 한 조각',
+             '아무 말도 필요 없다','그 자리에 머문다']
+  }
+};
+
+const pick = a => a[Math.floor(Math.random() * a.length)];
+
+/* 같은 영상 안에서 자막이 겹치지 않게 뽑는다.
+   역할 문구가 동나면 예비 문구로, 그것도 동나면 그때만 재사용한다. */
+function pickUnique(list, used, spare){
+  const fresh = (list || []).filter(x => !used.has(x));
+  if(fresh.length){ const c = pick(fresh); used.add(c); return c; }
+  const backup = (spare || []).filter(x => !used.has(x));
+  if(backup.length){ const c = pick(backup); used.add(c); return c; }
+  return pick(list && list.length ? list : (spare || ['']));
+}
+
+/* 장면 수에 맞춰 역할을 배분한다.
+   적으면 흐름을 대표하는 역할만 고르고, 많으면 전 역할을 순서대로 쓴다. */
+function buildRoles(n){
+  n = Math.max(1, Math.round(n));
+  if(n === 1) return ['open'];
+  if(n === 2) return ['open', 'close'];
+
+  const need = n - 2;
+  // 장면이 몇 개 없을 때는 대표 역할부터 쓴다. 3장면에 "문화"가 오면 홍보 영상이 되지 않는다.
+  const CORE = ['wide', 'sea', 'food', 'sunset'];
+  if(need === 1) return ['open', 'wide', 'close'];
+
+  const src = need <= CORE.length ? CORE : MIDDLE;
+  const M = src.length;
+  const mid = [];
+  for(let i = 0; i < need; i++){
+    const idx = Math.min(M - 1, Math.max(0, Math.round((i + 0.5) * M / need - 0.5)));
+    mid.push(src[idx]);
+  }
+  return ['open', ...mid, 'close'];
+}
+
+function makeLocalScenario(topic, tone, n){
+  const L = LINES[tone] || LINES.emo;
+  const fill = s => s.replace(/\{t\}/g, topic);
+  const roles = buildRoles(n);
+  const base = photoBaseQuery();
+  const used = new Set();
+
+  return {
+    title: fill(pick(L.title)),
+    outro: fill(pick(L.outro)),
+    scenes: roles.map((r, i) => ({
+      role: r,
+      caption: fill(pickUnique(L[r], used, L.filler)),
+      query: base + ' ' + ROLES[r].kw,
+      tr: i === 0 ? 'fade' : ROLES[r].tr
+    }))
+  };
+}
+
+/* ---------- 한글 검색어 → 영어 ---------- */
+/* 커먼즈는 한국어 색인이 얕아 한글로 검색하면 결과가 거의 없다.
+   낱말은 사전으로 옮기고, 고유명사는 위키백과에서 영어 표제어를 찾거나
+   연결이 막히면 로마자로 바꾼다. */
+
+const KO_DICT = {
+  // 자연·풍경
+  '바다':'sea','밤바다':'night sea','해변':'beach','해수욕장':'beach','해안':'coast','바닷가':'seaside',
+  '섬':'island','항구':'port','부두':'pier','등대':'lighthouse','절벽':'cliff','동굴':'cave',
+  '산':'mountain','계곡':'valley','폭포':'waterfall','숲':'forest','호수':'lake','강':'river',
+  '들판':'field','논':'rice field','하늘':'sky','구름':'cloud','별':'night sky',
+  '노을':'sunset','일몰':'sunset','일출':'sunrise','새벽':'dawn','야경':'night view','야간':'night',
+  '벚꽃':'cherry blossom','단풍':'autumn leaves','눈':'snow','안개':'fog',
+  '봄':'spring','여름':'summer','가을':'autumn','겨울':'winter',
+  // 도시·장소
+  '거리':'street','골목':'alley','시장':'market','야시장':'night market','광장':'square',
+  '공원':'park','정원':'garden','다리':'bridge','전망대':'observatory','타워':'tower',
+  '마을':'village','한옥':'hanok','한옥마을':'hanok village',
+  '사찰':'temple','절':'temple','궁':'palace','궁궐':'palace','성':'fortress','성곽':'fortress wall',
+  '박물관':'museum','미술관':'art museum','도서관':'library','시청':'city hall',
+  '역':'train station','기차역':'train station','공항':'airport','터미널':'bus terminal',
+  '온천':'hot spring','캠핑':'camping','캠핑장':'campsite','낚시':'fishing',
+  '케이블카':'cable car','유람선':'cruise ship','배':'boat','기차':'train','자전거':'bicycle',
+  // 사람·음식
+  '음식':'food','맛집':'restaurant','식당':'restaurant','카페':'cafe','커피':'coffee',
+  '회':'sashimi','해산물':'seafood','포장마차':'street food','전통시장':'traditional market',
+  '사람':'people','축제':'festival','공연':'performance','전통':'traditional',
+  // 영상·분위기
+  '여행':'travel','풍경':'landscape','전경':'panorama','야외':'outdoor','골목길':'alley',
+  '감성':'moody','분위기':'atmosphere','일상':'daily life',
+  // 음악 검색용
+  '잔잔한':'calm','신나는':'upbeat','밝은':'bright','웅장한':'epic','슬픈':'sad',
+  '피아노':'piano','기타':'guitar','재즈':'jazz','클래식':'classical','어쿠스틱':'acoustic',
+  '음악':'music','배경음악':'background music'
+};
+
+const HANGUL = /[\uAC00-\uD7A3]/;
+const RR_L = ['g','kk','n','d','tt','r','m','b','pp','s','ss','','j','jj','ch','k','t','p','h'];
+const RR_V = ['a','ae','ya','yae','eo','e','yeo','ye','o','wa','wae','oe','yo','u','wo','we','wi','yu','eu','ui','i'];
+const RR_T = ['','k','k','k','n','n','n','t','l','k','m','l','l','l','p','l','m','p','p','t','t','ng','t','t','k','t','p','t'];
+
+// 받침 + 다음 첫소리가 만나면 소리가 바뀐다 (국립국어원 로마자 표기 기준)
+const RR_LINK = {
+  k:  {n:['ng','n'], m:['ng','m'], r:['ng','n'], h:['','k']},
+  t:  {n:['n','n'],  m:['n','m'],  r:['n','n'],  h:['','t']},
+  p:  {n:['m','n'],  m:['m','m'],  r:['m','n'],  h:['','p']},
+  n:  {r:['l','l']},
+  l:  {n:['l','l'],  r:['l','l']},
+  ng: {r:['ng','n']},
+  m:  {r:['m','n']}
+};
+const RR_VOICED = {k:'g', t:'d', p:'b', l:'r'};   // 모음 앞에서는 울림소리로
+
+function romanize(word){
+  const parts = [];
+  for(const ch of word){
+    const code = ch.charCodeAt(0) - 0xAC00;
+    if(code < 0 || code > 11171){ parts.push({raw: ch}); continue; }
+    const l = Math.floor(code / 588), v = Math.floor((code % 588) / 28), t = code % 28;
+    parts.push({o: RR_L[l], v: RR_V[v], c: RR_T[t], vowelOnset: l === 11});
+  }
+
+  for(let i = 0; i < parts.length - 1; i++){
+    const a = parts[i], b = parts[i + 1];
+    if(a.raw || b.raw || !a.c) continue;
+    if(b.vowelOnset){
+      a.c = RR_VOICED[a.c] || a.c;          // 백암 → baegam
+      continue;
+    }
+    const rule = RR_LINK[a.c] && RR_LINK[a.c][b.o];
+    if(rule){ a.c = rule[0]; b.o = rule[1]; }
+  }
+
+  return parts.map(p => p.raw !== undefined ? p.raw : (p.o + p.v + p.c)).join('');
+}
+
+const enCache = new Map();
+
+async function lookupEnglishName(token){
+  if(enCache.has(token)) return enCache.get(token);
+  let out = null;
+  try{
+    const url = 'https://ko.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch='
+      + encodeURIComponent(token) + '&gsrlimit=1&prop=langlinks&lllang=en'
+      + '&format=json&formatversion=2&origin=*';
+    const d = await jget(url, 5000);
+    const page = (d.query && d.query.pages || [])[0];
+    const title = page && page.langlinks && page.langlinks[0] && page.langlinks[0].title;
+    if(title && !HANGUL.test(title) && title.length <= 40){
+      out = title.replace(/\s*\([^)]*\)\s*/g, ' ').trim();   // "Yeosu (city)" → "Yeosu"
+    }
+  }catch(e){ /* 연결이 막히면 로마자로 간다 */ }
+  enCache.set(token, out);
+  return out;
+}
+
+/* 사전에 없는 낱말은 뒤에 붙은 사전 단어를 떼어낸다: 여수밤바다 → 여수 + 밤바다 */
+function splitBySuffix(token){
+  for(let len = Math.min(6, token.length - 1); len >= 2; len--){
+    const tail = token.slice(-len);
+    if(KO_DICT[tail]) return [token.slice(0, -len), KO_DICT[tail]];
+  }
+  return null;
+}
+
+async function toEnglishQuery(q, online){
+  if(!q || !HANGUL.test(q)) return q;
+
+  const words = [];
+  for(const token of q.split(/\s+/).filter(Boolean)){
+    if(!HANGUL.test(token)){ words.push(token); continue; }
+    if(KO_DICT[token]){ words.push(KO_DICT[token]); continue; }
+
+    const split = splitBySuffix(token);
+    const head = split ? split[0] : token;
+    const tail = split ? split[1] : '';
+
+    let en = null;
+    if(head){
+      if(KO_DICT[head]) en = KO_DICT[head];
+      else if(online !== false) en = await lookupEnglishName(head);
+      if(!en) en = romanize(head).replace(/^./, c => c.toUpperCase());
+    }
+    words.push([en, tail].filter(Boolean).join(' '));
+  }
+  return words.join(' ').replace(/\s+/g, ' ').trim();
+}
+
+let qTouched = false;
+$('q').addEventListener('input', () => { qTouched = true; });
+
+function photoBaseQuery(){
+  const q = $('q').value.trim();
+  const topic = $('topic').value.trim();
+  // 검색어 칸을 직접 고친 적이 없으면 주제를 따라간다
+  if(qTouched && q) return q;
+  return topic || q || 'travel';
+}
+
+/* ---------- optional: write the script with Claude ---------- */
+async function makeAiScenario(topic, tone, n, key){
+  const toneName = {emo:'감성적이고 잔잔한', fun:'밝고 활기찬', info:'정보를 전달하는 담백한', cine:'시네마틱하고 절제된'}[tone];
+  const prompt =
+`너는 한국 여행 홍보 쇼츠의 카피라이터야. 주제: "${topic}"
+톤: ${toneName}. 장면 수: ${n}개.
+
+각 장면의 자막은 한국어로 16자 이내, 문장부호는 최소한으로.
+query는 위키미디어 커먼즈에서 그 장면에 어울리는 사진을 찾기 위한 영어 검색어로, 지명을 반드시 포함해.
+
+아래 JSON만 출력해. 설명, 코드펜스, 다른 텍스트는 절대 넣지 마.
+{"title":"오프닝 타이틀 12자 이내","outro":"엔딩 문구 12자 이내","scenes":[{"caption":"자막","query":"english search words"}]}`;
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: $('apiModel').value.trim() || 'claude-sonnet-4-6',
+      max_tokens: Math.min(3000, 500 + n * 90),
+      messages: [{role:'user', content: prompt}]
+    })
+  });
+
+  if(!res.ok){
+    const detail = await res.text().catch(() => '');
+    throw new Error('API 응답 오류 ' + res.status + (detail ? ' · ' + detail.slice(0,120) : ''));
+  }
+
+  const data = await res.json();
+  const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n');
+  const clean = text.replace(/```json|```/g, '').trim();
+  const parsed = JSON.parse(clean.slice(clean.indexOf('{'), clean.lastIndexOf('}') + 1));
+  const roles = buildRoles(parsed.scenes.length);
+
+  return {
+    title: parsed.title || topic,
+    outro: parsed.outro || topic,
+    scenes: parsed.scenes.map((s, i) => ({
+      role: roles[i] || 'wide',
+      caption: (s.caption || '').trim(),
+      query: (s.query || photoBaseQuery()).trim(),
+      tr: ROLES[roles[i] || 'wide'].tr
+    }))
+  };
+}
+
+async function makeScenario(){
+  const topic = $('topic').value.trim();
+  if(!topic){ gstat('영상 주제를 입력하세요.'); return null; }
+  const tone = $('tone').value;
+  const n = Math.max(2, Math.min(30, +$('sceneCount').value || 6));
+  const key = $('apiKey').value.trim();
+
+  if(key){
+    gstat('AI가 시나리오를 쓰는 중…');
+    try{
+      localStorage.setItem('yeosu_api_key', key);
+    }catch(e){}
+    try{
+      scenario = await makeAiScenario(topic, tone, n, key);
+      applyScenario();
+      gstat('AI 시나리오 ' + scenario.scenes.length + '장면을 만들었습니다.');
+      return scenario;
+    }catch(e){
+      console.error(e);
+      gstat('AI 생성에 실패해 내장 문구로 만들었습니다. · ' + e.message);
+    }
+  }
+
+  scenario = makeLocalScenario(topic, tone, n);
+  applyScenario();
+  if(!key) gstat(scenario.scenes.length + '장면 시나리오를 만들었습니다. 버튼을 다시 누르면 다른 문구가 나옵니다.');
+  return scenario;
+}
+
+function applyScenario(){
+  if(!scenario) return;
+  $('title').value = scenario.title;
+  $('outro').value = scenario.outro;
+  scenario.scenes.forEach((s, i) => {
+    if(clips[i]){ clips[i].text = s.caption; clips[i].tr = s.tr || clips[i].tr; }
+  });
+  renderScript();
+  render();
+}
+
+function renderScript(){
+  const box = $('scriptBox');
+  box.innerHTML = '';
+  if(!scenario){ box.style.display = 'none'; return; }
+  box.style.display = 'flex';
+
+  const line = (labelText, value, onChange, cls) => {
+    const el = document.createElement('div');
+    el.className = 'sline' + (cls ? ' ' + cls : '');
+    const s = document.createElement('span');
+    s.textContent = labelText;
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.value = value;
+    inp.oninput = e => onChange(e.target.value);
+    el.append(s, inp);
+    box.appendChild(el);
+  };
+
+  line('타이틀', scenario.title, v => { scenario.title = v; $('title').value = v; updateTotal(); redrawPreview(); }, 'head');
+  scenario.scenes.forEach((s, i) => {
+    line((i+1) + '. ' + ROLES[s.role].name, s.caption, v => {
+      s.caption = v;
+      if(clips[i]){ clips[i].text = v; render(); }
+    });
+  });
+  line('엔딩', scenario.outro, v => { scenario.outro = v; $('outro').value = v; updateTotal(); }, 'head');
+}
+
+/* ---------- photo auto-fill ---------- */
+
+$('genScript').onclick = async () => {
+  $('genScript').disabled = true;
+  await makeScenario();
+  $('genScript').disabled = false;
+};
+
+$('genAll').onclick = async () => {
+  const btn = $('genAll');
+  btn.disabled = true;
+  btn.textContent = '만드는 중…';
+  try{
+    const sc = await makeScenario();
+    if(!sc) return;
+
+    const used = new Set(clips.map(c => c.url));
+    const start = clips.length;
+    const typedBase = photoBaseQuery();
+    const base = HANGUL.test(typedBase) ? await toEnglishQuery(typedBase) : typedBase;
+    if(base !== typedBase){
+      // 장면별 검색어도 함께 영어로 (여수 밤바다 sea coast → Yeosu night sea sea coast)
+      sc.scenes.forEach(s => { s.query = s.query.split(typedBase).join(base); });
+    }
+    let pool = [];
+
+    if(start >= sc.scenes.length){
+      gstat('이미 장면이 ' + start + '개 있어 자막만 새로 넣었습니다. 사진도 새로 받으려면 장면을 지우고 다시 누르세요.');
+      return;
+    }
+
+    $('q').value = base;
+    const wanted = sc.scenes.length;
+
+    for(let i = start; i < sc.scenes.length; i++){
+      gstat('사진 찾는 중… ' + (i - start + 1) + '/' + (sc.scenes.length - start));
+      const kw = ROLES[sc.scenes[i].role].kw;
+      const head = base.split(/\s+/)[0];
+      const r = await photoSearchLadder([base + ' ' + kw, head + ' ' + kw, base, head], 8, 0);
+      let hit = r.items.find(p => !used.has(p.url));
+      if(!hit){
+        if(!pool.length){
+          const rp = await photoSearchLadder(shorterQueries(base), 24, 0);
+          pool = rp.items;
+        }
+        hit = pool.find(p => !used.has(p.url));
+      }
+      if(!hit) continue;
+      used.add(hit.url);
+      await addClipAsync(hit.url, hit.credit);
+    }
+
+    if(clips.length === start){
+      gstat('사진을 한 장도 받지 못했습니다. 위쪽 "연결 확인"을 눌러 어느 경로가 막혔는지 보세요.');
+    }else{
+      // 사진이 모자라면 시나리오를 실제 장면 수에 맞춰 줄인다
+      if(clips.length < sc.scenes.length){
+        sc.scenes = sc.scenes.slice(0, clips.length);
+        renderScript();
+      }
+      gstat('장면 ' + clips.length + '개를 채웠습니다.'
+        + (clips.length < wanted ? ' 사진이 ' + clips.length + '장만 검색돼 장면 수를 줄였습니다.' : '')
+        + ' 사진 출처: ' + (lastPhotoSource || '알 수 없음'));
+    }
+  }catch(e){
+    console.error(e);
+    gstat('사진을 불러오지 못했습니다. 인터넷 연결을 확인하세요.');
+  }finally{
+    btn.disabled = false;
+    btn.textContent = '사진까지 한 번에';
+  }
+};
+
+$('topic').addEventListener('keydown', e => { if(e.key === 'Enter') $('genScript').click(); });
+
+try{
+  const savedKey = localStorage.getItem('yeosu_api_key');
+  if(savedKey) $('apiKey').value = savedKey;
+}catch(e){}
+
+(() => {
+  const missing = recordingSupport();
+  if(missing){
+    setStatus('참고: 이 브라우저는 영상 저장을 지원하지 않습니다(' + missing
+      + '). 미리보기와 편집은 되지만 내보내기는 안 됩니다. 아이폰은 iOS 16.4 이상으로 업데이트하세요.');
+  }
+})();
+
+$('reset').onclick = () => {
+  if(!confirm('모든 장면, 자막, 설정을 지우고 처음 상태로 돌아갑니다. 계속할까요?')) return;
+
+  if(playing){ cancelAnimationFrame(raf); playing=false; $('play').textContent='재생'; }
+  clips.filter(isVideoClip).forEach(c => { try{ c.vid.pause(); }catch(e){} });
+  clips.length = 0;
+  scenario = null;
+
+  $('title').value = '';
+  $('outro').value = '';
+  $('topic').value = '';
+  $('scriptBox').innerHTML = '';
+  $('scriptBox').style.display = 'none';
+  $('gstatus').textContent = '';
+  $('q').value = '';
+  qTouched = false;
+  $('results').innerHTML = '';
+  $('morePhotos').style.display = 'none';
+  photoPage = 0;
+  photoQueryUsed = '';
+
+  audioBuf = null;
+  if(remoteAudio){ try{ remoteAudio.pause(); remoteAudio.src=''; }catch(e){} remoteAudio=null; }
+  remoteAudioUrl = '';
+  audioSource = null;
+  selectedTrack = null;
+  try{ localStorage.removeItem('yeosu_selected_track'); }catch(e){}
+  document.querySelectorAll('.track').forEach(t => t.classList.remove('on'));
+  mstat('');
+
+  $('result').innerHTML = '';
+  $('result').style.display = 'none';
+
+  resetSourceHealth();
+  offlineNotified = false;
+  document.querySelectorAll('.panel').forEach(p => {
+    p.style.borderColor = ''; p.style.boxShadow = '';
+  });
+
+  $('ratio').value = '16:9';
+  applyRatio();
+  $('sceneCount').value = '6';
+  render();
+  updateTotal();
+  setStatus('초기화됐습니다. 새 영상을 시작하세요.');
+};
+
+/* ---------- PWA ---------- */
+(function(){
+  if('serviceWorker' in navigator){
+    try{
+      var sw=[
+        "const C='travel-video-v1';",
+        "self.addEventListener('install',function(e){self.skipWaiting();});",
+        "self.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(ks){return Promise.all(ks.filter(function(k){return k!==C;}).map(function(k){return caches.delete(k);}));}));});",
+        "self.addEventListener('fetch',function(e){if(e.request.mode==='navigate'){e.respondWith(fetch(e.request).catch(function(){return caches.match(e.request);}));}})"
+      ].join('\n');
+      navigator.serviceWorker.register(
+        URL.createObjectURL(new Blob([sw],{type:'text/javascript'}))
+      ).catch(function(){});
+    }catch(err){}
+  }
+  var isIOS=/iPhone\|iPad\|iPod/i.test(navigator.userAgent);
+  if(isIOS && !navigator.standalone){
+    var shown; try{shown=localStorage.getItem('pwa_shown');}catch(e){}
+    if(!shown){
+      try{localStorage.setItem('pwa_shown','1');}catch(e){}
+      var tip=document.createElement('div');
+      tip.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1C2B2D;color:#F7F9FC;padding:14px 20px;border-radius:14px;font-size:14px;line-height:1.65;text-align:center;z-index:9999;box-shadow:0 4px 24px rgba(0,0,0,.65);max-width:300px;width:90vw;border:1px solid rgba(78,205,196,.3)';
+      tip.innerHTML='&#128247; 홈 화면에 추가하면 앱처럼 쓸 수 있어요.<br><strong>하단 공유 &#9650; &#8594; 홈 화면에 추가</strong>';
+      var btn=document.createElement('button');
+      btn.textContent='닫기';
+      btn.style.cssText='display:block;margin:10px auto 0;background:rgba(78,205,196,.15);border:1px solid rgba(78,205,196,.4);color:#4ECDC4;padding:6px 20px;border-radius:8px;font-size:13px;cursor:pointer';
+      btn.onclick=function(){tip.remove();};
+      tip.appendChild(btn);
+      document.body.appendChild(tip);
+      setTimeout(function(){if(tip.parentNode)tip.remove();},10000);
+    }
+  }
+})();
+
+/* 추측하지 말고 실제로 한 번 찔러본다 */
+(async () => {
+  try{
+    await jget('https://commons.wikimedia.org/w/api.php?action=query&format=json&formatversion=2&meta=siteinfo&origin=*', 5000);
+  }catch(e){
+    offlineMode(e.message || '연결 실패');
+  }
+})();
+
+setupFilterControls();
+applyRatio();
+render();
+</script>
+</body>
+</html>
