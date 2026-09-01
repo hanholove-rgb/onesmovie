@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>여행 홍보 영상 메이커</title>
+<title>한교동의 여행 홍보 영상 메이커</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0C1618">
@@ -249,20 +250,33 @@ details .fields{margin-top:10px}
         <div class="status" id="gstatus"></div>
         <div class="hint">타이틀·자막·엔딩 문구를 한 번에 채웁니다. 장면이 이미 있으면 그 개수에 맞춰 씁니다. 여기서 바로 고쳐 쓸 수 있고, 장면을 더 추가하면 순서대로 자막이 들어갑니다.</div>
 
-        <details>
-          <summary>AI로 더 자연스럽게 쓰기 (선택)</summary>
-          <div class="fields">
-            <div>
-              <label>Anthropic API 키</label>
-              <input type="password" id="apiKey" placeholder="sk-ant-...">
-            </div>
-            <div>
-              <label>모델 이름</label>
-              <input type="text" id="apiModel" value="claude-sonnet-4-6">
-            </div>
-            <div class="hint">키를 넣으면 AI가 주제에 맞는 문구를 직접 씁니다. 비워두면 내장 문구 세트로 만듭니다. 키는 이 브라우저에만 저장되며, 파일을 더블클릭해 여는 대신 웹서버로 열어야 연결됩니다.</div>
+        <div id="aiKeySection" style="border-top:1px solid var(--line);padding-top:11px;margin-top:3px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <label style="margin:0;flex:1">Claude API 키 <span style="font-size:10px;color:var(--mute)">(선택 · 더 자연스러운 문구)</span></label>
+            <button class="ghost" id="toggleApiKey" style="padding:3px 10px;font-size:12px">설정</button>
           </div>
-        </details>
+          <div id="apiKeyBox" style="display:none">
+            <div class="two" style="margin-bottom:6px">
+              <div>
+                <label>API 키</label>
+                <div style="position:relative">
+                  <input type="password" id="apiKey" placeholder="sk-ant-..." style="padding-right:36px">
+                  <button id="toggleApiVis" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--mute);cursor:pointer;padding:4px;font-size:13px">👁</button>
+                </div>
+              </div>
+              <div>
+                <label>모델</label>
+                <select id="apiModel">
+                  <option value="claude-sonnet-4-6">Sonnet 4.6 (권장)</option>
+                  <option value="claude-haiku-4-5-20251001">Haiku 4.5 (빠름)</option>
+                  <option value="claude-opus-4-6">Opus 4.6 (고품질)</option>
+                </select>
+              </div>
+            </div>
+            <div id="apiKeyStatus" style="font-size:11px;margin-bottom:6px"></div>
+            <div class="hint">키를 저장하면 시나리오 만들기 버튼을 누를 때 AI가 주제에 딱 맞는 문구를 직접 씁니다. 비워두면 주제 분석 내장 엔진을 씁니다. 키는 이 기기 브라우저에만 저장됩니다.</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -277,7 +291,7 @@ details .fields{margin-top:10px}
           <button id="search">검색</button><button class="ghost" id="testPhotos" type="button">연결 확인</button>
         </div>
       </div>
-      <div class="hint">한글로 입력해도 자동으로 영어로 바꿔 검색합니다(여수 밤바다 → Yeosu night sea). 바뀐 검색어가 칸에 남으니 직접 고칠 수 있습니다.</div>
+      <div class="hint">한글 입력 시 자동으로 영어로 변환합니다(여수 밤바다 → Yeosu night sea). "사진까지 한 번에"를 쓰면 각 장면에 맞는 사진을 자동으로 찾습니다.</div>
       <div class="results" id="results"></div>
       <button class="ghost" id="morePhotos" style="width:100%;margin-top:10px;display:none;">사진 더 불러오기</button>
     </div>
@@ -309,9 +323,23 @@ details .fields{margin-top:10px}
         <div class="row">
           <div>
             <select id="mood">
-              <option value="calm">잔잔한 배경</option>
-              <option value="bright">밝고 경쾌하게</option>
-              <option value="cine">시네마틱</option>
+              <optgroup label="─ 감성·잔잔">
+                <option value="calm">잔잔한 배경</option>
+                <option value="ballad">감성 발라드 (피아노+스트링)</option>
+                <option value="sunset">노을·감성 (어쿠스틱 기타)</option>
+                <option value="nature">자연·힐링 (숲속 산책)</option>
+              </optgroup>
+              <optgroup label="─ 밝음·에너지">
+                <option value="bright">밝고 경쾌하게</option>
+                <option value="pop">신나는 팝 (업비트)</option>
+                <option value="lofi">로파이 힙합 (그루비)</option>
+                <option value="jazz">재즈 카페 (스윙)</option>
+              </optgroup>
+              <optgroup label="─ 극적·무드">
+                <option value="cine">시네마틱</option>
+                <option value="epic">서사시·웅장 (오케스트라)</option>
+                <option value="mystic">신비로운·드라마틱</option>
+              </optgroup>
             </select>
           </div>
           <button class="ghost" id="genMusic" type="button">만들기</button>
@@ -341,19 +369,39 @@ details .fields{margin-top:10px}
       <div class="fields">
         <div><label>전체 영상 필터</label>
           <select id="filter">
-            <option value="none">원본</option><option value="bright">밝고 선명하게</option>
-            <option value="warm">따뜻한 감성</option><option value="cool">시원한 바다</option>
-            <option value="vintage">빈티지</option><option value="cinematic">시네마틱</option>
-            <option value="bw">흑백</option><option value="dream">몽환적</option>
+            <option value="none">원본</option>
+            <optgroup label="─ 밝기·감성">
+              <option value="bright">밝고 선명하게</option>
+              <option value="warm">따뜻한 감성</option>
+              <option value="cool">시원한 바다</option>
+              <option value="golden">노을·골든아워</option>
+              <option value="bluehour">새벽·블루아워</option>
+            </optgroup>
+            <optgroup label="─ 필름·무드">
+              <option value="vintage">빈티지</option>
+              <option value="matte">매트 필름</option>
+              <option value="cinematic">시네마틱</option>
+              <option value="hdr">선명한 HDR</option>
+            </optgroup>
+            <optgroup label="─ 특수 효과">
+              <option value="bw">흑백</option>
+              <option value="dream">몽환적</option>
+              <option value="mist">안개·미스트</option>
+              <option value="popart">팝아트</option>
+              <option value="tilt">틸트쉬프트</option>
+            </optgroup>
           </select>
         </div>
         <div class="two"><div><label>밝기</label><input type="range" id="brightness" min="50" max="150" value="100"></div>
         <div><label>대비</label><input type="range" id="contrast" min="50" max="160" value="100"></div></div>
         <div class="two"><div><label>채도</label><input type="range" id="saturation" min="0" max="200" value="100"></div>
-        <div><label>흐림</label><input type="range" id="blur" min="0" max="8" value="0" step="0.5"></div></div>
+        <div><label>색조</label><input type="range" id="hue" min="-180" max="180" value="0"></div></div>
+        <div class="two"><div><label>흐림</label><input type="range" id="blur" min="0" max="8" value="0" step="0.5"></div>
+        <div><label>비네팅</label><input type="range" id="vignette" min="0" max="100" value="0"></div></div>
+        <div id="tiltRow" style="display:none"><label>틸트쉬프트 강도</label><input type="range" id="tiltStrength" min="1" max="10" value="4" step="0.5"></div>
         <button class="ghost" id="resetFilter" type="button">필터 초기화</button>
       </div>
-      <div class="hint">필터는 미리보기와 최종 영상에 동일하게 적용됩니다.</div>
+      <div class="hint">필터는 미리보기와 최종 영상에 동일하게 적용됩니다. 틸트쉬프트는 프리셋 메뉴에서 선택하세요.</div>
     </div>
 
     <div class="panel">
@@ -370,7 +418,10 @@ details .fields{margin-top:10px}
         <div class="two">
           <div>
             <label>기본 장면 길이(초)</label>
-            <input type="number" id="dur" value="1.5" min="0.5" max="60" step="0.5">
+            <div style="display:flex;gap:6px;align-items:center">
+              <input type="number" id="dur" value="1.5" min="0.5" max="60" step="0.5" style="flex:1">
+              <button class="ghost" id="applyDur" type="button" style="white-space:nowrap;padding:6px 10px;font-size:12px">전체 적용</button>
+            </div>
           </div>
           <div>
             <label>화면 비율</label>
@@ -381,7 +432,35 @@ details .fields{margin-top:10px}
             </select>
           </div>
         </div>
-        <button class="ghost" id="autofit">60초에 맞춰 자동 배분</button>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="ghost" id="autofit" style="flex:1">60초에 맞춰 자동 배분</button>
+          <select id="bulkDurPreset" style="font-size:12px;padding:6px 8px" title="빠른 일괄 설정">
+            <option value="">빠른 설정…</option>
+            <optgroup label="쇼츠/릴스 (15초)">
+              <option value="15_3">3장면 → 각 5초</option>
+              <option value="15_5">5장면 → 각 3초</option>
+              <option value="15_6">6장면 → 각 2.5초</option>
+            </optgroup>
+            <optgroup label="일반 (30초)">
+              <option value="30_6">6장면 → 각 5초</option>
+              <option value="30_8">8장면 → 각 3.5초</option>
+              <option value="30_10">10장면 → 각 3초</option>
+            </optgroup>
+            <optgroup label="롱폼 (60초)">
+              <option value="60_6">6장면 → 각 10초</option>
+              <option value="60_10">10장면 → 각 6초</option>
+              <option value="60_12">12장면 → 각 5초</option>
+            </optgroup>
+            <optgroup label="직접 입력">
+              <option value="custom_1">모두 1초</option>
+              <option value="custom_2">모두 2초</option>
+              <option value="custom_3">모두 3초</option>
+              <option value="custom_5">모두 5초</option>
+              <option value="custom_7">모두 7초</option>
+              <option value="custom_10">모두 10초</option>
+            </optgroup>
+          </select>
+        </div>
       </div>
     </div>
   </div>
@@ -620,13 +699,20 @@ async function photoSearchLadder(candidates, limit, offset, onTry){
   return {items: [], source: null, errors: lastErrors, query: null, tried};
 }
 
-/* 단어를 뒤에서부터 덜어낸 후보들 */
+/* 단어를 뒤에서부터 덜어낸 후보들.
+   커먼즈 AND 색인: 단어가 많을수록 0건. 2단어·1단어 fallback 을 항상 포함. */
 function shorterQueries(q){
   const w = String(q || '').split(/\s+/).filter(Boolean);
-  const out = [w.join(' ')];
-  if(w.length > 3) out.push(w.slice(0, 3).join(' '));
-  if(w.length > 2) out.push(w.slice(0, 2).join(' '));
-  if(w.length > 1) out.push(w[0]);
+  const seen = new Set();
+  const out = [];
+  for(const cand of [
+    w.join(' '),
+    w.slice(0, 3).join(' '),
+    w.slice(0, 2).join(' '),
+    w[0] || ''
+  ]){
+    if(cand && !seen.has(cand)){ seen.add(cand); out.push(cand); }
+  }
   return out;
 }
 
@@ -1046,9 +1132,17 @@ function fmt(s){
 /* ---------- offline music synthesis ---------- */
 /* 외부 연결이 막힌 곳에서도 배경음악을 쓸 수 있게 브라우저가 직접 합성한다. */
 const MOODS = {
-  calm:   {bpm: 72,  chords: [[60,64,67],[57,60,64],[65,69,72],[55,59,62]], pad:'sine',     arp:'sine',     arpGain:0.055, kick:false, cutoff:2600},
-  bright: {bpm: 112, chords: [[60,64,67],[67,71,74],[57,60,64],[65,69,72]], pad:'triangle', arp:'triangle', arpGain:0.085, kick:true,  cutoff:5200},
-  cine:   {bpm: 84,  chords: [[57,60,64],[65,69,72],[60,64,67],[55,59,62]], pad:'sawtooth', arp:'sine',     arpGain:0.045, kick:false, cutoff:1800}
+  calm:    {bpm:72,  chords:[[60,64,67],[57,60,64],[65,69,72],[55,59,62]], pad:'sine',     arp:'sine',     arpGain:0.055, kick:false, cutoff:2600},
+  bright:  {bpm:112, chords:[[60,64,67],[67,71,74],[57,60,64],[65,69,72]], pad:'triangle', arp:'triangle', arpGain:0.085, kick:true,  cutoff:5200},
+  cine:    {bpm:84,  chords:[[57,60,64],[65,69,72],[60,64,67],[55,59,62]], pad:'sawtooth', arp:'sine',     arpGain:0.045, kick:false, cutoff:1800},
+  ballad:  {bpm:68,  chords:[[60,64,67],[57,60,64],[62,65,69],[55,59,62]], pad:'sine',     arp:'sine',     arpGain:0.04,  kick:false, cutoff:3200, strings:true},
+  lofi:    {bpm:78,  chords:[[60,63,67],[57,60,65],[58,62,65],[55,59,63]], pad:'triangle', arp:'sine',     arpGain:0.05,  kick:true,  cutoff:1600, lofi:true},
+  jazz:    {bpm:92,  chords:[[60,64,67,71],[57,60,64,67],[65,69,72,76],[55,59,62,65]], pad:'sine', arp:'triangle', arpGain:0.06, kick:false, cutoff:4000, swing:true},
+  epic:    {bpm:96,  chords:[[57,60,64],[53,57,60],[60,64,67],[55,59,62]], pad:'sawtooth', arp:'sawtooth', arpGain:0.035, kick:true,  cutoff:2200, epic:true},
+  pop:     {bpm:128, chords:[[60,64,67],[65,69,72],[57,60,64],[62,65,69]], pad:'triangle', arp:'triangle', arpGain:0.09,  kick:true,  cutoff:6000},
+  nature:  {bpm:60,  chords:[[60,64,67],[57,60,64],[65,69,72],[62,65,69]], pad:'sine',     arp:'sine',     arpGain:0.03,  kick:false, cutoff:3000, nature:true},
+  sunset:  {bpm:70,  chords:[[60,64,67],[57,60,64],[55,59,62],[53,57,60]], pad:'triangle', arp:'triangle', arpGain:0.06,  kick:false, cutoff:2800, guitar:true},
+  mystic:  {bpm:76,  chords:[[57,60,64],[60,63,67],[62,65,68],[55,58,62]], pad:'sine',     arp:'sine',     arpGain:0.04,  kick:false, cutoff:2000, mystic:true},
 };
 
 const midiHz = n => 440 * Math.pow(2, (n - 69) / 12);
@@ -1085,6 +1179,80 @@ function thump(ctx, dest, start){
   o.stop(start + 0.2);
 }
 
+/* 추가 타악기: 하이햇 느낌의 짧은 노이즈 */
+function hihat(ctx, dest, start, vol){
+  const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.04), ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for(let i = 0; i < d.length; i++) d[i] = (Math.random()*2-1) * (1 - i/d.length);
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  const hp = ctx.createBiquadFilter();
+  hp.type = 'highpass';
+  hp.frequency.value = 8000;
+  const g = ctx.createGain();
+  g.gain.value = vol || 0.06;
+  src.connect(hp); hp.connect(g); g.connect(dest);
+  src.start(start); src.stop(start + 0.05);
+}
+
+/* 스네어 느낌 */
+function snare(ctx, dest, start){
+  const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.12), ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for(let i = 0; i < d.length; i++) d[i] = (Math.random()*2-1) * Math.exp(-i / (d.length * 0.3));
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  const bp = ctx.createBiquadFilter();
+  bp.type = 'bandpass'; bp.frequency.value = 1200; bp.Q.value = 0.8;
+  const g = ctx.createGain(); g.gain.value = 0.12;
+  src.connect(bp); bp.connect(g); g.connect(dest);
+  src.start(start);
+}
+
+/* 스트링 느낌: 여러 배음 쌓기 */
+function stringNote(ctx, dest, freq, start, dur, vol){
+  [1, 2, 3, 4].forEach((h, i) => {
+    const o = ctx.createOscillator();
+    o.type = 'sawtooth';
+    o.frequency.value = freq * h;
+    const g = ctx.createGain();
+    const pk = (vol || 0.04) / (i + 1);
+    g.gain.setValueAtTime(0, start);
+    g.gain.linearRampToValueAtTime(pk, start + 0.4);
+    g.gain.setValueAtTime(pk, start + dur - 0.3);
+    g.gain.linearRampToValueAtTime(0, start + dur);
+    o.connect(g); g.connect(dest);
+    o.start(start); o.stop(start + dur + 0.1);
+  });
+}
+
+/* 기타 플럭 느낌: 빠른 어택, 느린 감쇠 */
+function pluck(ctx, dest, freq, start, vol){
+  const o = ctx.createOscillator();
+  o.type = 'triangle';
+  o.frequency.value = freq;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(vol || 0.08, start);
+  g.gain.exponentialRampToValueAtTime(0.001, start + 0.9);
+  o.connect(g); g.connect(dest);
+  o.start(start); o.stop(start + 1.0);
+}
+
+/* 자연음 느낌: 랜덤 피치 부드러운 팟 */
+function naturePad(ctx, dest, freq, start, dur, vol){
+  const o = ctx.createOscillator();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(freq, start);
+  o.frequency.linearRampToValueAtTime(freq * 1.004, start + dur * 0.5);
+  o.frequency.linearRampToValueAtTime(freq, start + dur);
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0, start);
+  g.gain.linearRampToValueAtTime(vol || 0.04, start + dur * 0.4);
+  g.gain.linearRampToValueAtTime(0, start + dur);
+  o.connect(g); g.connect(dest);
+  o.start(start); o.stop(start + dur + 0.05);
+}
+
 async function renderMusic(moodKey, seconds){
   const OC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
   if(!OC) throw new Error('이 브라우저는 음악 합성을 지원하지 않습니다.');
@@ -1111,22 +1279,133 @@ async function renderMusic(moodKey, seconds){
     if(t0 >= dur) break;
     const chord = m.chords[bar % m.chords.length];
     const span = Math.min(barLen, dur - t0);
+    const swingOff = m.swing ? beat * 0.06 : 0;  // 스윙 오프셋
 
-    // 패드: 코드를 길게 깔아준다
+    // ── 공통: 패드 코드 ──────────────────────────────────────
     chord.forEach(n => tone(ctx, lp, midiHz(n), t0, span * 0.98, m.pad, 0.05));
-    // 베이스: 근음 한 옥타브 아래
-    tone(ctx, lp, midiHz(chord[0] - 24), t0, span * 0.9, 'sine', 0.11);
-    // 아르페지오: 8분음표로 코드음을 훑는다
-    for(let i = 0; i < 8; i++){
-      const t = t0 + i * (beat / 2);
-      if(t >= dur) break;
-      const n = chord[i % chord.length] + (i >= 4 ? 12 : 0);
-      tone(ctx, lp, midiHz(n), t, beat * 0.45, m.arp, m.arpGain);
+
+    // ── 베이스 ────────────────────────────────────────────────
+    const bassNote = chord[0] - 24;
+    if(m.lofi){
+      // 로파이: 붓점 베이스 (1박 + 3박반)
+      tone(ctx, lp, midiHz(bassNote), t0,           beat * 1.4, 'triangle', 0.13);
+      tone(ctx, lp, midiHz(bassNote), t0 + beat*2.5, beat * 1.4, 'triangle', 0.10);
+    } else if(m.epic){
+      // 웅장: 저음 강타
+      tone(ctx, lp, midiHz(bassNote - 12), t0, span * 0.95, 'sawtooth', 0.09);
+      tone(ctx, lp, midiHz(bassNote),      t0, beat * 0.8,  'sine',     0.14);
+    } else {
+      tone(ctx, lp, midiHz(bassNote), t0, span * 0.9, 'sine', 0.11);
     }
+
+    // ── 아르페지오 / 멜로디 ────────────────────────────────────
+    const arpCount = m.swing ? 6 : 8;
+    const arpStep  = m.swing ? beat * (2/3) : beat * 0.5;
+    for(let i = 0; i < arpCount; i++){
+      const sw = (m.swing && i % 2 === 1) ? swingOff : 0;
+      const t = t0 + i * arpStep + sw;
+      if(t >= dur) break;
+      const n = chord[i % chord.length] + (i >= arpCount/2 ? 12 : 0);
+      tone(ctx, lp, midiHz(n), t, arpStep * 0.8, m.arp, m.arpGain);
+    }
+
+    // ── 킥드럼 ────────────────────────────────────────────────
     if(m.kick){
-      for(let b = 0; b < 4; b++){
+      const kickPattern = m.lofi  ? [0, 2]         // 로파이: 1·3박
+                        : m.pop   ? [0, 1, 2, 3]   // 팝: 4온음표
+                        : m.epic  ? [0, 2.5]        // 웅장: 1·3.5박
+                        : [0, 2];                   // 기본: 2박
+      kickPattern.forEach(b => {
         const t = t0 + b * beat;
         if(t < dur) thump(ctx, lp, t);
+      });
+    }
+
+    // ── 하이햇 ────────────────────────────────────────────────
+    if(m.lofi || m.pop){
+      const step = m.lofi ? beat * 0.5 : beat * 0.25;
+      for(let i = 0; i < Math.floor(barLen / step); i++){
+        const t = t0 + i * step;
+        if(t < dur) hihat(ctx, lp, t, m.lofi ? 0.04 : 0.05);
+      }
+    }
+
+    // ── 스네어 ────────────────────────────────────────────────
+    if(m.lofi || m.pop){
+      [1, 3].forEach(b => {
+        const t = t0 + b * beat;
+        if(t < dur) snare(ctx, lp, t);
+      });
+    }
+
+    // ── 스트링 (발라드) ────────────────────────────────────────
+    if(m.strings){
+      chord.forEach(n => stringNote(ctx, lp, midiHz(n + 12), t0, span * 0.95, 0.035));
+    }
+
+    // ── 기타 플럭 (노을·감성) ──────────────────────────────────
+    if(m.guitar){
+      chord.forEach((n, i) => {
+        const t = t0 + i * beat * 0.18;
+        if(t < dur) pluck(ctx, lp, midiHz(n), t, 0.07);
+      });
+      // 멜로디 라인: 코드 최고음으로 느린 멜로디
+      const hi = chord[chord.length - 1] + 12;
+      pluck(ctx, lp, midiHz(hi), t0 + beat * 1.5, 0.09);
+      pluck(ctx, lp, midiHz(hi - 2), t0 + beat * 3.2, 0.07);
+    }
+
+    // ── 자연음 (nature) ────────────────────────────────────────
+    if(m.nature){
+      chord.forEach((n, i) => {
+        const offset = i * beat * 0.8 + Math.random() * 0.2;
+        naturePad(ctx, lp, midiHz(n + 12), t0 + offset, beat * 2.5, 0.03);
+      });
+      // 새소리 느낌: 짧고 높은 랜덤 음
+      if(bar % 2 === 0){
+        const birdFreq = midiHz(chord[0] + 24 + Math.floor(Math.random() * 5));
+        pluck(ctx, lp, birdFreq, t0 + beat * (1 + Math.random()), 0.04);
+      }
+    }
+
+    // ── 서사시·웅장: 금관 느낌 레이어 ────────────────────────
+    if(m.epic){
+      chord.slice(0, 3).forEach((n, i) => {
+        const o = ctx.createOscillator();
+        o.type = 'sawtooth';
+        o.frequency.value = midiHz(n + 12);
+        const hp = ctx.createBiquadFilter();
+        hp.type = 'highpass'; hp.frequency.value = 200;
+        const g = ctx.createGain();
+        const atk = 0.5;
+        g.gain.setValueAtTime(0, t0 + i * 0.06);
+        g.gain.linearRampToValueAtTime(0.04, t0 + i * 0.06 + atk);
+        g.gain.setValueAtTime(0.04, t0 + span - 0.4);
+        g.gain.linearRampToValueAtTime(0, t0 + span);
+        o.connect(hp); hp.connect(g); g.connect(lp);
+        o.start(t0 + i * 0.06); o.stop(t0 + span + 0.1);
+      });
+    }
+
+    // ── 신비로운: 느린 글리산도 ────────────────────────────────
+    if(m.mystic){
+      chord.forEach((n, i) => {
+        const o = ctx.createOscillator();
+        o.type = 'sine';
+        o.frequency.setValueAtTime(midiHz(n - 2), t0);
+        o.frequency.linearRampToValueAtTime(midiHz(n + 2), t0 + span);
+        const g = ctx.createGain();
+        const pk = 0.045 / (i + 1);
+        g.gain.setValueAtTime(0, t0);
+        g.gain.linearRampToValueAtTime(pk, t0 + span * 0.5);
+        g.gain.linearRampToValueAtTime(0, t0 + span);
+        o.connect(g); g.connect(lp);
+        o.start(t0); o.stop(t0 + span + 0.1);
+      });
+      // 팅~ 느낌의 짧은 하이노트
+      if(bar % 4 === 2){
+        const bell = chord[1] + 24;
+        tone(ctx, lp, midiHz(bell), t0 + beat, beat * 3, 'sine', 0.06);
       }
     }
   }
@@ -1176,7 +1455,14 @@ const PRESETS = {
   vintage:   {b:104, c:92,  s:78,  extra:'sepia(45%)'},
   cinematic: {b:94,  c:132, s:88,  extra:'contrast(108%)'},
   bw:        {b:104, c:118, s:0,   extra:'grayscale(100%)'},
-  dream:     {b:110, c:88,  s:120, extra:'blur(0.6px) saturate(112%)'}
+  dream:     {b:110, c:88,  s:120, extra:'blur(0.6px) saturate(112%)'},
+  golden:    {b:108, c:108, s:130, extra:'sepia(30%) hue-rotate(-18deg) brightness(108%)'},
+  bluehour:  {b:96,  c:112, s:90,  extra:'hue-rotate(185deg) saturate(70%) brightness(88%)'},
+  matte:     {b:106, c:84,  s:82,  extra:'sepia(12%) brightness(106%) contrast(84%)'},
+  hdr:       {b:100, c:148, s:135, extra:'saturate(135%) contrast(115%)'},
+  mist:      {b:115, c:78,  s:88,  extra:'blur(0.8px) brightness(116%) contrast(78%)'},
+  popart:    {b:102, c:125, s:210, extra:'saturate(210%) contrast(118%)'},
+  tilt:      {b:102, c:110, s:108, extra:''},
 };
 
 let filterLocked = false;   // true while a preset is driving the sliders
@@ -1185,12 +1471,48 @@ function currentFilter(){
   const p = PRESETS[$('filter').value] || PRESETS.none;
   const b = +$('brightness').value;
   const c = +$('contrast').value;
-  const s = +$('saturation').value;
-  const bl = +$('blur').value;
-  let f = `brightness(${b}%) contrast(${c}%) saturate(${s}%)`;
+  const sat = +$('saturation').value;
+  const hue = +$('hue').value;
+  const bl  = +$('blur').value;
+  let f = `brightness(${b}%) contrast(${c}%) saturate(${sat}%)`;
+  if(hue !== 0) f += ` hue-rotate(${hue}deg)`;
   if(p.extra) f += ' ' + p.extra;
   if(bl > 0)  f += ` blur(${bl}px)`;
   return f === 'brightness(100%) contrast(100%) saturate(100%)' ? 'none' : f;
+}
+
+/* 비네팅과 틸트쉬프트는 canvas 위에 오버레이로 그린다 */
+function drawOverlays(){
+  if(!cx) return;
+  const W = cv.width, H = cv.height;
+  const vig = +$('vignette').value;
+  const tilt = $('filter').value === 'tilt';
+  const tiltStr = tilt ? +$('tiltStrength').value : 0;
+
+  if(vig > 0){
+    const grad = cx.createRadialGradient(W/2, H/2, H*0.2, W/2, H/2, H*0.85);
+    grad.addColorStop(0, 'rgba(0,0,0,0)');
+    grad.addColorStop(1, `rgba(0,0,0,${(vig/100)*0.72})`);
+    cx.fillStyle = grad;
+    cx.fillRect(0, 0, W, H);
+  }
+
+  if(tiltStr > 0){
+    // 위아래 흐림 띠: ctx.filter 로 blurring 대신 반투명 어두운 띠로 표현
+    // (canvas 에서 부분 블러는 직접 불가 → 어두운 페이드로 미니어처 느낌)
+    const bandH = Math.round(H * 0.22 * (tiltStr / 10));
+    const topGrad = cx.createLinearGradient(0, 0, 0, bandH * 2.5);
+    topGrad.addColorStop(0, `rgba(0,0,0,${0.32 * tiltStr / 10})`);
+    topGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    cx.fillStyle = topGrad;
+    cx.fillRect(0, 0, W, bandH * 2.5);
+
+    const botGrad = cx.createLinearGradient(0, H, 0, H - bandH * 2.5);
+    botGrad.addColorStop(0, `rgba(0,0,0,${0.32 * tiltStr / 10})`);
+    botGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    cx.fillStyle = botGrad;
+    cx.fillRect(0, H - bandH * 2.5, W, bandH * 2.5);
+  }
 }
 
 function setupFilterControls(){
@@ -1198,16 +1520,19 @@ function setupFilterControls(){
   setupFilterControls.done = true;
 
   $('filter').onchange = () => {
-    const p = PRESETS[$('filter').value] || PRESETS.none;
+    const v = $('filter').value;
+    const p = PRESETS[v] || PRESETS.none;
     filterLocked = true;
     $('brightness').value = p.b;
     $('contrast').value   = p.c;
     $('saturation').value = p.s;
+    if(!p.extra || !p.extra.includes('hue-rotate')) $('hue').value = 0;
     filterLocked = false;
+    $('tiltRow').style.display = v === 'tilt' ? 'block' : 'none';
     redrawPreview();
   };
 
-  ['brightness','contrast','saturation','blur'].forEach(id => {
+  ['brightness','contrast','saturation','hue','blur','vignette','tiltStrength'].forEach(id => {
     $(id).oninput = () => {
       if(!filterLocked) redrawPreview();
     };
@@ -1218,6 +1543,10 @@ function setupFilterControls(){
     $('brightness').value = 100;
     $('contrast').value   = 100;
     $('saturation').value = 100;
+    $('hue').value = 0;
+    $('vignette').value = 0;
+    $('tiltStrength').value = 4;
+    $('tiltRow').style.display = 'none';
     $('blur').value       = 0;
     redrawPreview();
     setStatus('필터를 원본으로 되돌렸습니다.');
@@ -1934,21 +2263,21 @@ function gstat(m){ $('gstatus').textContent = m; }
 /* 장면 역할. 배열 순서가 그대로 이야기 흐름이다.
    영어 키워드는 주제가 한글이어도 사진 검색이 되게 하기 위한 것. */
 const ROLES = {
-  open:     {name:'오프닝', kw:'landmark',    tr:'fade'},
-  arrive:   {name:'도착',   kw:'station',     tr:'slide'},
-  wide:     {name:'풍경',   kw:'panorama',    tr:'zoom'},
-  sea:      {name:'바다',   kw:'beach',       tr:'zoom'},
-  nature:   {name:'자연',   kw:'mountain',    tr:'fade'},
-  street:   {name:'골목',   kw:'street',      tr:'slide'},
-  detail:   {name:'디테일', kw:'architecture',tr:'fade'},
-  culture:  {name:'문화',   kw:'temple',      tr:'fade'},
-  life:     {name:'사람',   kw:'market',      tr:'slide'},
-  food:     {name:'먹거리', kw:'food',        tr:'fade'},
-  cafe:     {name:'카페',   kw:'cafe',        tr:'fade'},
-  activity: {name:'체험',   kw:'boat',        tr:'flash'},
-  sunset:   {name:'노을',   kw:'sunset',      tr:'zoom'},
-  night:    {name:'야경',   kw:'night',       tr:'fade'},
-  close:    {name:'마무리', kw:'scenery',     tr:'fade'}
+  open:     {name:'오프닝', kw:'landmark',    tr:'fade',  kws:['landmark','view','entrance']},
+  arrive:   {name:'도착',   kw:'station',     tr:'slide', kws:['station','port','arrival']},
+  wide:     {name:'풍경',   kw:'panorama',    tr:'zoom',  kws:['panorama','landscape','view']},
+  sea:      {name:'바다',   kw:'beach',       tr:'zoom',  kws:['beach','sea','coast','ocean']},
+  nature:   {name:'자연',   kw:'mountain',    tr:'fade',  kws:['mountain','forest','park','nature']},
+  street:   {name:'골목',   kw:'street',      tr:'slide', kws:['street','alley','old town']},
+  detail:   {name:'디테일', kw:'architecture',tr:'fade',  kws:['architecture','detail','texture']},
+  culture:  {name:'문화',   kw:'temple',      tr:'fade',  kws:['temple','palace','heritage','museum']},
+  life:     {name:'사람',   kw:'market',      tr:'slide', kws:['market','people','festival']},
+  food:     {name:'먹거리', kw:'food',        tr:'fade',  kws:['food','restaurant','dish']},
+  cafe:     {name:'카페',   kw:'cafe',        tr:'fade',  kws:['cafe','coffee','interior']},
+  activity: {name:'체험',   kw:'boat',        tr:'flash', kws:['boat','cable car','tour','activity']},
+  sunset:   {name:'노을',   kw:'sunset',      tr:'zoom',  kws:['sunset','golden hour','dusk']},
+  night:    {name:'야경',   kw:'night',       tr:'fade',  kws:['night','illumination','lights']},
+  close:    {name:'마무리', kw:'scenery',     tr:'fade',  kws:['scenery','landscape','view']}
 };
 const MIDDLE = ['arrive','wide','sea','nature','street','detail','culture','life','food','cafe','activity','sunset','night'];
 
@@ -2077,22 +2406,230 @@ function buildRoles(n){
   return ['open', ...mid, 'close'];
 }
 
-function makeLocalScenario(topic, tone, n){
+/* ──────────────────────────────────────────────────────────────────────
+   주제 키워드 분석 → 맞춤 문구 생성
+   주제에서 장소 특성·계절·활동·분위기 키워드를 읽어 문구를 조합합니다.
+   ──────────────────────────────────────────────────────────────────── */
+
+/* 주제에서 특성 태그를 뽑아낸다 */
+const TOPIC_TAGS = {
+  sea:      /바다|해변|해안|항구|섬|등대|포구|바닷가|밤바다|해수욕/,
+  mountain: /산|계곡|등산|트레킹|고원|능선|봉우리|설산/,
+  city:     /도시|시내|거리|골목|카페|야경|번화가|광장|시장/,
+  nature:   /숲|공원|정원|들판|호수|강|폭포|계절|초록|단풍|벚꽃/,
+  food:     /음식|맛집|먹거리|맛|식당|포장마차|시장|해산물|회|국밥|비빔/,
+  culture:  /문화|역사|사찰|궁|절|박물관|미술관|전통|한옥|유산/,
+  activity: /체험|축제|공연|캠핑|낚시|서핑|트레킹|투어|케이블카|유람선/,
+  healing:  /힐링|치유|쉬다|쉼|여유|느긋|산책|조용|한적|평화|고요/,
+  romantic: /감성|로맨틱|설레|연인|데이트|둘이|커플|야경|노을|밤/,
+  family:   /가족|아이|어린이|체험|키즈|어른아이|여행/,
+  spring:   /봄|벚꽃|꽃|봄날|따뜻|새싹/,
+  summer:   /여름|바다|수영|서핑|더위|뙤약볕|휴가|피서/,
+  autumn:   /가을|단풍|코스모스|낙엽|쌀쌀|추수/,
+  winter:   /겨울|눈|설경|온천|따뜻한|스키|크리스마스/,
+  night:    /밤|야경|야간|불빛|노을|저녁|황혼|일몰/,
+  local:    /로컬|골목|현지|소도시|마을|동네|시골|한적/
+};
+
+function analyzeTopic(topic){
+  const tags = new Set();
+  for(const [tag, re] of Object.entries(TOPIC_TAGS)){
+    if(re.test(topic)) tags.add(tag);
+  }
+  return tags;
+}
+
+/* 태그 조합에 따른 맞춤 문구 라이브러리 */
+const CUSTOM = {
+  /* 바다 */
+  sea: {
+    emo: {
+      title: ['{t}의 파도','바다 앞에서','{t}, 물빛이 가득한 곳','파도 소리 들리는 {t}'],
+      open:  ['{t}의 파도 소리','수평선이 보이는 곳','바다가 가장 먼저'],
+      sea:   ['이 빛깔의 바다였습니다','파도가 발끝을 적십니다','수평선이 마음을 비웁니다'],
+      close: ['바다는 오래 기억됩니다','파도 소리가 귀에 남습니다','또 {t}의 바다로']
+    },
+    fun: {
+      title: ['{t} 바다 출발!','바다 갔다 왔습니다','{t} 해변 완전 정복'],
+      sea:   ['물색 실화','여기서 수영해야죠','파도 타러 왔습니다'],
+      close: ['다음엔 더 오래 있을게요','{t} 바다 강추','바다 또 와요']
+    },
+    cine: {
+      title: ['{t}','파도','수평선'],
+      sea:   ['파도는 쉬지 않는다','수평선 너머','물빛이 말을 건넨다'],
+      close: ['바다는 남는다','파도처럼','{t}']
+    }
+  },
+  /* 야경·밤 */
+  night: {
+    emo: {
+      title: ['{t}의 밤','불빛 가득한 곳','{t}, 밤이 더 예뻐','밤이 빛나는 {t}'],
+      night: ['불빛이 가장 솔직한 시간','밤이 되어야 보이는 것','어둠 속에서 빛나는 {t}'],
+      close: ['밤의 {t}를 기억합니다','불빛이 오래 남습니다','{t}의 밤, 또 오고 싶다']
+    },
+    fun: {
+      title: ['{t} 야경 찍으러 왔다','밤의 {t}','야경 맛집 {t}'],
+      night: ['야경 실화입니다','밤이 더 예쁜 곳','불빛 장난 아님'],
+      close: ['낮보다 밤이 더 좋다','야경 맛집 인정','{t} 밤에 오세요']
+    },
+    cine: {
+      title: ['{t}의 밤','야경','불빛'],
+      night: ['어둠이 걷히면','도시는 밤에 빛난다','불빛의 언어'],
+      close: ['밤은 계속된다','{t}','빛 속으로']
+    }
+  },
+  /* 힐링·쉼 */
+  healing: {
+    emo: {
+      title: ['{t}에서 쉬다','{t}에서 잠시','느린 {t}'],
+      open:  ['아무것도 안 해도 되는 곳','여기선 천천히 해도 됩니다','잠시 멈추는 시간'],
+      wide:  ['아무 생각 없이 걷다 보면','여기선 시간이 느립니다','바람이 대신 말해줍니다'],
+      close: ['충분히 쉬었습니다','다시 일상으로 돌아갈 힘','오래 기억할 쉼이었습니다']
+    },
+    fun: {
+      title: ['{t}에서 충전완료','힐링하러 {t} 왔다','재충전 완료'],
+      open:  ['드디어 쉽니다','아무것도 안 하러 왔습니다','폰 잠깐 내려놓겠습니다'],
+      close: ['에너지 100% 충전','일상 복귀 준비 완료','다음엔 더 오래 있을게요']
+    },
+    cine: {
+      title: ['쉼','{t}에서','잠시'],
+      open:  ['멈추는 시간','숨을 고른다','시간이 느려지는 곳'],
+      close: ['충분했다','그리고 다시','{t}']
+    }
+  },
+  /* 음식 */
+  food: {
+    emo: {
+      title: ['{t}의 맛','입으로 기억하는 {t}','{t}의 한 끼'],
+      food:  ['이 맛이 {t}입니다','한 그릇에 담긴 이야기','여기서만 맛볼 수 있는'],
+      close: ['맛으로 기억되는 여행','다시 오고 싶은 이유가 생겼습니다','{t}의 맛, 오래 남습니다']
+    },
+    fun: {
+      title: ['{t} 맛집 탐방','먹으러 {t} 왔다','{t} 먹킷리스트'],
+      food:  ['이거 꼭 드세요','줄 서도 먹을 가치 있음','여기서 이걸 안 먹으면 후회'],
+      close: ['맛집 정복 완료','배부르게 먹고 갑니다','{t} 또 올게요']
+    },
+    cine: {
+      title: ['{t}의 맛','한 끼','식탁 위의 이야기'],
+      food:  ['손끝의 온기','입 안에서 녹는다','맛은 기억이 된다'],
+      close: ['다시, 이 맛이 그립다','음식은 남는다','{t}']
+    }
+  },
+  /* 계절 */
+  spring: {
+    emo: {
+      title: ['{t}의 봄','봄날의 {t}','{t}, 벚꽃 필 때'],
+      open:  ['꽃이 먼저 알려줍니다','봄이 왔습니다, {t}에'],
+      nature:['벚꽃이 가득한 길','봄바람이 먼저 인사합니다','분홍빛 하루입니다'],
+      close: ['봄날의 {t}, 또 보고 싶다','꽃이 지기 전에 다시 오겠습니다','봄은 짧아서 더 예쁩니다']
+    },
+    fun: {
+      title: ['{t} 벚꽃 보러 왔다','봄 {t} 완전 예쁨','{t} 봄 나들이'],
+      nature:['벚꽃 터졌습니다','인생 사진 각 나옵니다','여기 진짜 예뻐요'],
+      close: ['봄에 또 와야겠습니다','꽃보다 {t}','봄 {t} 강추']
+    },
+    cine: {
+      title: ['봄, {t}','{t}의 봄','꽃'],
+      nature:['꽃잎이 진다','봄은 짧다','분홍빛 기억'],
+      close: ['봄은 돌아온다','{t}','다시 봄']
+    }
+  },
+  autumn: {
+    emo: {
+      title: ['{t}의 가을','단풍 드는 {t}','{t}, 가을빛 속에'],
+      nature:['단풍이 절정입니다','가을이 물들었습니다','빨간 길 위에 서서'],
+      close: ['가을 {t}, 잊지 못합니다','단풍보다 더 예쁜 기억','가을엔 꼭 {t}로']
+    },
+    fun: {
+      title: ['{t} 단풍 보러 왔다','가을 {t} 완전 예쁨','{t} 단풍 나들이'],
+      nature:['단풍 미쳤습니다','여기 진짜 예뻐요','가을 색깔 실화'],
+      close: ['가을에 또 와야겠습니다','단풍 {t} 강추','가을 {t} 저장']
+    },
+    cine: {
+      title: ['가을, {t}','{t}의 가을','단풍'],
+      nature:['잎이 진다','가을은 짧다','붉은 기억'],
+      close: ['가을은 돌아온다','{t}','다시 가을']
+    }
+  },
+  /* 로컬·소도시 */
+  local: {
+    emo: {
+      title: ['작은 도시 {t}','{t}, 아는 사람만 아는 곳','소박한 {t}'],
+      open:  ['사람이 많지 않아 좋았습니다','이름이 낯설어 더 설렜습니다','조용한 곳을 찾았습니다'],
+      street:['오래된 골목이 반깁니다','천천히 걸어야 보이는 것들','여기선 서두를 필요 없습니다'],
+      close: ['이런 곳을 알게 됐습니다','아직 아는 사람이 적어서 좋습니다','또 오고 싶은 {t}']
+    },
+    fun: {
+      title: ['{t} 로컬 탐방','숨은 보석 {t}','아무도 안 가는 {t}'],
+      street:['여기 진짜 아는 사람만 알아요','숨은 맛집 발견','로컬 감성 최고'],
+      close: ['다음엔 친구 데리고 올게요','여기 알려주기 아깝다','{t} 찐 로컬 맛집']
+    },
+    cine: {
+      title: ['{t}','작은 도시','골목'],
+      street:['아무도 서두르지 않는다','골목은 기억한다','오래된 것들'],
+      close: ['이곳은 남는다','{t}','작은 것들']
+    }
+  }
+};
+
+/* 주제 분석 결과에 맞춰 LINES 를 태그별 맞춤 문구로 덮어씌운다 */
+function buildCustomLines(topic, tone, tags){
+  // 기본 라이브러리를 깊은 복사
+  const base = {};
   const L = LINES[tone] || LINES.emo;
-  const fill = s => s.replace(/\{t\}/g, topic);
+  for(const [k, v] of Object.entries(L)) base[k] = v.slice();
+
+  // 매칭되는 태그의 맞춤 문구를 앞쪽에 추가 (우선순위↑)
+  const priority = ['healing','romantic','sea','night','food','spring','autumn','local','mountain'];
+  for(const tag of priority){
+    if(!tags.has(tag)) continue;
+    const custom = CUSTOM[tag] && CUSTOM[tag][tone];
+    if(!custom) continue;
+    for(const [key, lines] of Object.entries(custom)){
+      if(!base[key]) base[key] = [];
+      // 맞춤 문구를 앞에 끼워 넣어 pick 확률을 높인다
+      base[key] = [...lines, ...base[key]];
+    }
+  }
+  return base;
+}
+
+function makeLocalScenario(topic, tone, n){
+  const tags = analyzeTopic(topic);
+  const L = buildCustomLines(topic, tone, tags);
+
+  // {t}를 채운 뒤 중복 표현 정리 (예: "단풍 드는 {t}" + topic="단풍 여행" → "단풍 드는 단풍 여행")
+  const fill = s => {
+    let r = s.replace(/\{t\}/g, topic);
+    // 타이틀/엔딩: 앞 수식어가 주제와 중복되면 주제만 남긴다
+    r = r.replace(/(봄|여름|가을|겨울|바다|단풍|힐링|감성|로컬|야경)\s+([\s\S]*?)\1/g, '$1 $2');
+    return r;
+  };
+
   const roles = buildRoles(n);
   const base = photoBaseQuery();
   const used = new Set();
+
+  // 역할별 문구: 태그와 맞지 않는 역할은 filler 로 대체
+  const sceneCaption = (r) => {
+    // 내륙 주제면 바다 역할 문구를 자연 문구로 교체
+    if(r === 'sea' && !tags.has('sea') && !tags.has('summer')){
+      return pickUnique(L.nature || L.wide || L.filler, used, L.filler);
+    }
+    return pickUnique(L[r], used, L.filler);
+  };
 
   return {
     title: fill(pick(L.title)),
     outro: fill(pick(L.outro)),
     scenes: roles.map((r, i) => ({
       role: r,
-      caption: fill(pickUnique(L[r], used, L.filler)),
+      caption: fill(sceneCaption(r)),
       query: base + ' ' + ROLES[r].kw,
+      roleKws: (ROLES[r] && ROLES[r].kws) || [ROLES[r].kw],
       tr: i === 0 ? 'fade' : ROLES[r].tr
-    }))
+    })),
+    _tags: [...tags]
   };
 }
 
@@ -2281,6 +2818,7 @@ query는 위키미디어 커먼즈에서 그 장면에 어울리는 사진을 �
       role: roles[i] || 'wide',
       caption: (s.caption || '').trim(),
       query: (s.query || photoBaseQuery()).trim(),
+      roleKws: (ROLES[roles[i] || 'wide'] && ROLES[roles[i] || 'wide'].kws) || [ROLES[roles[i] || 'wide'].kw],
       tr: ROLES[roles[i] || 'wide'].tr
     }))
   };
@@ -2311,7 +2849,15 @@ async function makeScenario(){
 
   scenario = makeLocalScenario(topic, tone, n);
   applyScenario();
-  if(!key) gstat(scenario.scenes.length + '장면 시나리오를 만들었습니다. 버튼을 다시 누르면 다른 문구가 나옵니다.');
+  if(!key){
+    const tagNames = {'sea':'바다','mountain':'산','city':'도시','nature':'자연','food':'음식',
+      'culture':'문화','activity':'체험','healing':'힐링','romantic':'감성','family':'가족',
+      'spring':'봄','summer':'여름','autumn':'가을','winter':'겨울','night':'야경','local':'로컬'};
+    const detected = (scenario._tags||[]).map(t=>tagNames[t]||t).join(', ');
+    gstat(scenario.scenes.length + '장면 시나리오를 만들었습니다.'
+      + (detected ? ' 감지된 주제: ' + detected : ' (다시 누르면 다른 문구)')
+    );
+  }
   return scenario;
 }
 
@@ -2391,10 +2937,28 @@ $('genAll').onclick = async () => {
 
     for(let i = start; i < sc.scenes.length; i++){
       gstat('사진 찾는 중… ' + (i - start + 1) + '/' + (sc.scenes.length - start));
-      const kw = ROLES[sc.scenes[i].role].kw;
-      const head = base.split(/\s+/)[0];
-      const r = await photoSearchLadder([base + ' ' + kw, head + ' ' + kw, base, head], 8, 0);
+      const role = sc.scenes[i].role;
+      const roleKws = sc.scenes[i].roleKws || (ROLES[role] && ROLES[role].kws) || [ROLES[role] && ROLES[role].kw || 'scenery'];
+      const head = base.split(/\s+/)[0];   // 지명 첫 단어
+
+      // 검색 사다리: 지명+역할어 → 지명만+역할어 → 역할어만 → 지명만
+      // 역할 관련성을 최대한 유지하되, 끝까지 못 찾으면 지명만으로 보완
+      const cands = [];
+      for(const kw of roleKws){
+        if(base !== head) cands.push(base + ' ' + kw);   // "Yeosu Korea beach"
+        cands.push(head + ' ' + kw);                     // "Yeosu beach"
+      }
+      for(const kw of roleKws) cands.push(kw);           // "beach" (역할만)
+      cands.push(head);                                   // "Yeosu" (지명만, 최후)
+
+      // 중복 제거
+      const seen = new Set();
+      const uniqueCands = cands.filter(c => c && !seen.has(c) && seen.add(c));
+
+      const r = await photoSearchLadder(uniqueCands, 10, 0);
       let hit = r.items.find(p => !used.has(p.url));
+
+      // 역할 검색으로 못 찾으면 공용 풀에서 보완
       if(!hit){
         if(!pool.length){
           const rp = await photoSearchLadder(shorterQueries(base), 24, 0);
@@ -2489,6 +3053,74 @@ $('reset').onclick = () => {
   updateTotal();
   setStatus('초기화됐습니다. 새 영상을 시작하세요.');
 };
+
+
+/* ---------- API 키 UI ---------- */
+(()=>{
+  // 토글 버튼
+  $('toggleApiKey').onclick = () => {
+    const box = $('apiKeyBox');
+    const open = box.style.display === 'none';
+    box.style.display = open ? 'block' : 'none';
+    $('toggleApiKey').textContent = open ? '접기' : '설정';
+  };
+
+  // 비밀번호 표시/숨기기
+  $('toggleApiVis').onclick = () => {
+    const inp = $('apiKey');
+    const show = inp.type === 'password';
+    inp.type = show ? 'text' : 'password';
+    $('toggleApiVis').textContent = show ? '🙈' : '👁';
+  };
+
+  // 저장된 키 불러오기
+  try{
+    const saved = localStorage.getItem('yeosu_api_key');
+    if(saved){
+      $('apiKey').value = saved;
+      updateApiStatus(saved);
+    }
+    const savedModel = localStorage.getItem('yeosu_api_model');
+    if(savedModel){
+      const sel = $('apiModel');
+      for(const opt of sel.options) if(opt.value === savedModel) opt.selected = true;
+    }
+  }catch(e){}
+
+  // 키 입력 시 저장 + 상태 업데이트
+  $('apiKey').addEventListener('input', e => {
+    const v = e.target.value.trim();
+    try{
+      if(v) localStorage.setItem('yeosu_api_key', v);
+      else localStorage.removeItem('yeosu_api_key');
+    }catch(e){}
+    updateApiStatus(v);
+  });
+
+  $('apiModel').addEventListener('change', e => {
+    try{ localStorage.setItem('yeosu_api_model', e.target.value); }catch(e){}
+  });
+
+  // 이미 키가 있으면 설정창 열어두기
+  try{
+    if(localStorage.getItem('yeosu_api_key')) {
+      $('apiKeyBox').style.display = 'block';
+      $('toggleApiKey').textContent = '접기';
+    }
+  }catch(e){}
+})();
+
+function updateApiStatus(key){
+  const el = $('apiKeyStatus');
+  if(!key){ el.textContent = ''; return; }
+  if(!key.startsWith('sk-ant-')){
+    el.style.color = '#ff6b6b';
+    el.textContent = '⚠ Anthropic API 키는 sk-ant- 로 시작합니다.';
+    return;
+  }
+  el.style.color = '#4ECDC4';
+  el.textContent = '✓ 키 형식이 맞습니다. 시나리오 만들기를 누르면 AI가 씁니다.';
+}
 
 /* ---------- PWA ---------- */
 (function(){
