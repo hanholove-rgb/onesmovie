@@ -3,9 +3,10 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>한교동의 여행 홍보 영상 메이커</title>
+<title>여행 홍보 영상 메이커</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjogIuyXrO2WiSDtmY3rs7Qg7JiB7IOBIOuplOydtOy7pCIsICJzaG9ydF9uYW1lIjogIuyYgeyDgSDrqZTsnbTsu6QiLCAiZGVzY3JpcHRpb24iOiAi7IKs7KeEwrfsmIHsg4HsnLzroZwg7Jes7ZaJIO2ZjeuztCDsmIHsg4HsnYQg66eM65Oc64qUIOyVsSIsICJzdGFydF91cmwiOiAiLiIsICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLCAiYmFja2dyb3VuZF9jb2xvciI6ICIjMEMxNjE4IiwgInRoZW1lX2NvbG9yIjogIiMwQzE2MTgiLCAib3JpZW50YXRpb24iOiAicG9ydHJhaXQtcHJpbWFyeSIsICJsYW5nIjogImtvIiwgImljb25zIjogW3sic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjRiV3h1Y3owaWFIUjBjRG92TDNkM2R5NTNNeTV2Y21jdk1qQXdNQzl6ZG1jaUlIWnBaWGRDYjNnOUlqQWdNQ0ExTVRJZ05URXlJajQ4Y21WamRDQjNhV1IwYUQwaU5URXlJaUJvWldsbmFIUTlJalV4TWlJZ2NuZzlJamsySWlCbWFXeHNQU0lqTUVNeE5qRTRJaTgrUEhKbFkzUWdlRDBpTnpJaUlIazlJakU0TUNJZ2QybGtkR2c5SWpNMk9DSWdhR1ZwWjJoMFBTSXlNVFlpSUhKNFBTSXhPQ0lnWm1sc2JEMGlibTl1WlNJZ2MzUnliMnRsUFNJak5FVkRSRU0wSWlCemRISnZhMlV0ZDJsa2RHZzlJakl5SWk4K1BIQnZiSGxuYjI0Z2NHOXBiblJ6UFNJeU1qQXNNak15SURJeU1Dd3pOREFnTXpNeUxESTROaUlnWm1sc2JEMGlJelJGUTBSRE5DSXZQanhqYVhKamJHVWdZM2c5SWpJMU5pSWdZM2s5SWpFd09DSWdjajBpTXpBaUlHWnBiR3c5SWlOR04wSTNNekVpTHo0OEwzTjJaejQ9IiwgInNpemVzIjogIjUxMng1MTIiLCAidHlwZSI6ICJpbWFnZS9zdmcreG1sIiwgInB1cnBvc2UiOiAiYW55IG1hc2thYmxlIn1dfQ==">
 <meta name="theme-color" content="#0C1618">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -187,7 +188,7 @@ details .fields{margin-top:10px}
 <body>
 
 <header>
-  <h1>여행 홍보<br><em>영상 메이커</em></h1>
+  <h1>한교동의 여행 홍보<br><br><em>영상 메이커</em></h1>
   <div class="tag">로그인 없이 사진·음원을 찾고, 최대 1분 쇼츠로 내보냅니다</div>
 </header>
 
@@ -231,15 +232,25 @@ details .fields{margin-top:10px}
           <div>
             <label>톤</label>
             <select id="tone">
-              <option value="emo">감성적</option>
-              <option value="fun">활기찬</option>
-              <option value="info">정보 전달</option>
-              <option value="cine">시네마틱</option>
+              <optgroup label="─ 감성">
+                <option value="emo">감성적</option>
+                <option value="romantic">로맨틱·커플</option>
+                <option value="healing">힐링·쉼</option>
+                <option value="cine">시네마틱</option>
+              </optgroup>
+              <optgroup label="─ 밝음·일상">
+                <option value="fun">활기찬</option>
+                <option value="vlog">여행 브이로그</option>
+              </optgroup>
+              <optgroup label="─ 정보·기타">
+                <option value="info">정보 전달</option>
+                <option value="minimal">미니멀·간결</option>
+              </optgroup>
             </select>
           </div>
           <div>
             <label>장면 수</label>
-            <input type="number" id="sceneCount" value="6" min="2" max="30">
+            <input type="number" id="sceneCount" value="10" min="2" max="30">
           </div>
         </div>
         <div class="row">
@@ -530,24 +541,42 @@ async function jget(url, ms){
 
 const isPhotoName = n => /\.(jpe?g|png|webp)$/i.test(n || '');
 
-async function srcCommonsApi(q, limit, offset){
-  // origin=* 는 인코딩하지 않고 그대로 붙여야 익명 CORS가 허용된다
-  const url = 'https://commons.wikimedia.org/w/api.php?action=query&generator=search'
+function commonsUrl(q, limit, offset){
+  return 'https://commons.wikimedia.org/w/api.php?action=query&generator=search'
     + '&gsrnamespace=6&gsrsearch=' + encodeURIComponent(q)
     + '&gsrlimit=' + limit + (offset ? '&gsroffset=' + offset : '')
     + '&prop=imageinfo&iiprop=url&iiurlwidth=1280&format=json&formatversion=2&origin=*';
-  const d = await jget(url);
-  const pages = d.query?.pages || [];
-  return pages
-    .slice()
-    .sort((a, b) => (a.index || 0) - (b.index || 0))
-    .map(p => {
-      const info = (p.imageinfo || [])[0];
-      const name = (p.title || '').replace(/^File:/, '');
-      if(!info || !isPhotoName(name)) return null;
-      return {url: info.thumburl || info.url, credit: name};
-    })
-    .filter(Boolean);
+}
+function parseCommonsPages(d){
+  return (d.query?.pages || [])
+    .slice().sort((a,b)=>(a.index||0)-(b.index||0))
+    .map(p=>{
+      const info=(p.imageinfo||[])[0];
+      const name=(p.title||'').replace(/^File:/,'');
+      if(!info||!isPhotoName(name)) return null;
+      return {url:info.thumburl||info.url, credit:name};
+    }).filter(Boolean);
+}
+async function srcCommonsApi(q, limit, offset){
+  const words = q.trim().split(/\s+/).filter(Boolean);
+
+  // 1차: 그대로 시도 (AND)
+  let d = await jget(commonsUrl(q, limit, offset));
+  let items = parseCommonsPages(d);
+  if(items.length) return items;
+
+  // 단어가 2개 이상이면 OR 검색으로 재시도
+  if(words.length >= 2){
+    const orQ = words.join(' OR ');
+    d = await jget(commonsUrl(orQ, limit, offset));
+    items = parseCommonsPages(d);
+    if(items.length) return items;
+
+    // 첫 단어만으로 마지막 시도
+    d = await jget(commonsUrl(words[0], limit, offset));
+    items = parseCommonsPages(d);
+  }
+  return items;
 }
 srcCommonsApi.label = '위키미디어 커먼즈';
 
@@ -700,19 +729,17 @@ async function photoSearchLadder(candidates, limit, offset, onTry){
 }
 
 /* 단어를 뒤에서부터 덜어낸 후보들.
-   커먼즈 AND 색인: 단어가 많을수록 0건. 2단어·1단어 fallback 을 항상 포함. */
+   srcCommonsApi 가 내부에서 OR·단어축소를 시도하므로
+   여기서는 지명만 남긴 최후 후보를 추가로 제공한다. */
 function shorterQueries(q){
   const w = String(q || '').split(/\s+/).filter(Boolean);
   const seen = new Set();
   const out = [];
-  for(const cand of [
-    w.join(' '),
-    w.slice(0, 3).join(' '),
-    w.slice(0, 2).join(' '),
-    w[0] || ''
-  ]){
-    if(cand && !seen.has(cand)){ seen.add(cand); out.push(cand); }
-  }
+  const add = c => { if(c && !seen.has(c)){ seen.add(c); out.push(c); } };
+  add(w.join(' '));                              // 전체
+  if(w.length > 3) add(w.slice(0,3).join(' ')); // 3단어
+  if(w.length > 2) add(w.slice(0,2).join(' ')); // 2단어
+  if(w.length > 1) add(w[0]);                   // 1단어(지명)
   return out;
 }
 
@@ -1865,18 +1892,74 @@ $('autofit').onclick = () => {
   if(!clips.length) return;
   const extra = ($('title').value?1.6:0) + ($('outro').value?1.8:0);
   const each = Math.max(.5, Math.round((60-extra)/clips.length*10)/10);
-  clips.forEach(c => c.dur = each);
+  clips.filter(c => !isVideoClip(c)).forEach(c => c.dur = each);
   render();
+};
+
+$('applyDur').onclick = () => {
+  const t = Math.max(0.5, +$('dur').value || 2);
+  const photos = clips.filter(c => !isVideoClip(c));
+  if(!photos.length){
+    setStatus(clips.length ? '사진 장면이 없습니다. 영상 클립은 트림 슬라이더로 조정하세요.' : '장면을 먼저 추가하세요.');
+    return;
+  }
+  photos.forEach(c => c.dur = t);
+  render();
+  setStatus('사진 장면 ' + photos.length + '개를 ' + t + '초로 설정했습니다.');
+};
+
+$('bulkDurPreset').onchange = function(){
+  const v = this.value;
+  if(!v) return;
+  this.value = '';
+
+  if(v.startsWith('custom_')){
+    const t = +v.split('_')[1];
+    const photos = clips.filter(c => !isVideoClip(c));
+    if(!photos.length){
+      $('dur').value = t;
+      setStatus('기본 장면 길이를 ' + t + '초로 설정했습니다.');
+      return;
+    }
+    photos.forEach(c => c.dur = t);
+    $('dur').value = t;
+    render();
+    setStatus('사진 장면 ' + photos.length + '개를 ' + t + '초로 설정했습니다.');
+    return;
+  }
+
+  const [total, count] = v.split('_').map(Number);
+  const videoDur = clips.filter(isVideoClip).reduce((a,c) => a + clipDuration(c), 0);
+  const photos = clips.filter(c => !isVideoClip(c));
+  const extra = ($('title').value?1.6:0) + ($('outro').value?1.8:0);
+  const availSec = Math.max(0.5, total - videoDur - extra);
+
+  if(!photos.length){
+    const t = Math.max(0.5, +(availSec / count).toFixed(1));
+    $('sceneCount').value = count;
+    $('dur').value = t;
+    setStatus('기준 ' + total + '초 · 장면 수 ' + count + '개 · 기본 길이 ' + t + '초로 예비 설정했습니다.');
+    return;
+  }
+
+  const t = Math.max(0.5, +(availSec / photos.length).toFixed(1));
+  photos.forEach(c => c.dur = t);
+  $('dur').value = t;
+  render();
+  setStatus('총 ' + total + '초 기준 · 사진 ' + photos.length + '장 → 각 ' + t + '초.');
 };
 
 function updateTotal(){
   const t = totalTime();
-  $('total').innerHTML = t.toFixed(1) + 's <small>/ 최대 60s</small>';
-  $('total').style.color = t <= 60 ? 'var(--sea)' : '#E25555';
-  if(t > 60) setStatus('영상 길이가 1분을 초과했습니다. 장면 길이를 줄여주세요.');
+  const hasVideo = clips.some(isVideoClip);
+  const limit = hasVideo ? 300 : 60;   // 영상 클립 있으면 5분까지 허용
+  $('total').innerHTML = t.toFixed(1) + 's'
+    + ' <small>/ 최대 ' + (hasVideo ? '5분' : '60s') + '</small>';
+  $('total').style.color = t <= limit ? 'var(--sea)' : '#E25555';
+  if(t > limit) setStatus('영상 길이가 ' + (hasVideo ? '5분' : '1분') + '을 초과했습니다.');
 }
 function totalTime(){
-  return clips.reduce((s,c)=>s+c.dur,0)
+  return clips.reduce((s,c)=>s+clipDuration(c),0)
     + ($('title').value?1.6:0) + ($('outro').value?1.8:0);
 }
 $('title').oninput = $('outro').oninput = () => {
@@ -1963,8 +2046,9 @@ function draw(time){
   let t = time - tLen;
   for(let i=0;i<clips.length;i++){
     const c = clips[i];
-    if(t < c.dur){
-      const p = t/c.dur, fade = 0.4;
+    const _cdur = clipDuration(c);
+    if(t < _cdur){
+      const p = t/_cdur, fade = 0.4;
       cx.save();
       cx.filter = currentFilter();
       if(c.tr==='fade')  cx.globalAlpha = t<fade ? t/fade : 1;
@@ -1973,7 +2057,7 @@ function draw(time){
       if(c.tr==='slide' && t<fade) cx.translate(W*(1-t/fade)*0.4, 0);
       if(isVideoClip(c)){
         const vid = c.vid;
-        const elapsed = t * (c.trimEnd - c.trimStart) / c.dur;
+        const elapsed = t * (c.trimEnd - c.trimStart) / _cdur;
         const target = c.trimStart + elapsed;
         // 재생 중이 아닐 때(미리보기 정지)는 currentTime 으로 프레임을 표시
         if(!playing && Math.abs(vid.currentTime - target) > 0.15){
@@ -1988,10 +2072,11 @@ function draw(time){
       if(c.tr==='flash' && t<0.16){
         cx.fillStyle='rgba(255,255,255,'+(1-t/0.16)*0.8+')'; cx.fillRect(0,0,W,H);
       }
+      drawOverlays();
       caption(c.text, t<0.3 ? t/0.3 : 1);
       return;
     }
-    t -= c.dur;
+    t -= _cdur;
   }
   if(O && t < oLen){
     const a = t<0.4 ? t/0.4 : 1;
@@ -2187,7 +2272,12 @@ function showResult(blob, name){
 
 $('export').onclick = () => {
   if(!clips.length){ setStatus('장면을 먼저 추가하세요.'); return; }
-  if(totalTime() > 60.05){ setStatus('최대 1분까지만 내보낼 수 있습니다. 현재 장면 길이를 줄여주세요.'); return; }
+  const _hasVideo = clips.some(isVideoClip);
+  const _maxSec = _hasVideo ? 300 : 60;
+  if(totalTime() > _maxSec + 0.05){
+    setStatus('최대 ' + (_hasVideo ? '5분' : '1분') + '까지 내보낼 수 있습니다. 장면 길이를 줄여주세요.');
+    return;
+  }
 
   const missing = recordingSupport();
   if(missing){
@@ -2369,7 +2459,91 @@ const LINES = {
     filler: ['침묵이 흐른다','무엇도 서두르지 않는다','장면은 이어진다',
              '기억이 스친다','남겨진 온기','여정의 한 조각',
              '아무 말도 필요 없다','그 자리에 머문다']
-  }
+  },
+  romantic: {
+    title:  ['{t}에서의 설렘','{t}, 둘이서','사랑스러운 {t}','{t}의 두 사람'],
+    outro:  ['함께여서 좋았습니다','이 순간을 기억해요','{t}에서의 하루','우리의 {t}'],
+    open:   ['{t}에서 시작됩니다','설레는 첫 발걸음','함께 도착했습니다'],
+    arrive: ['함께 온 여행입니다','두 사람의 첫 장면','설레임이 가득합니다'],
+    wide:   ['이런 풍경을 함께 봅니다','둘이서 보니 더 예쁩니다','오래 머물고 싶은 곳'],
+    sea:    ['파도 앞에 나란히 서서','바다는 로맨틱합니다','두 사람의 수평선'],
+    nature: ['초록빛 아래 걷습니다','바람이 불어오는 길','자연 속 우리'],
+    street: ['손잡고 걷는 골목','둘이 걸어야 예쁜 길','발걸음이 가볍습니다'],
+    detail: ['작은 것도 예뻐 보이는 날','눈에 담아두겠습니다','이 장면도 우리의 것'],
+    culture:['함께 보는 역사','둘이서 알아가는 곳','설명이 필요 없습니다'],
+    life:   ['우리만의 하루입니다','함께라서 다른 풍경','두 사람의 시간'],
+    food:   ['같이 먹는 것이 맛있습니다','한 접시를 나눕니다','여행의 맛은 함께'],
+    cafe:   ['창가에 마주 앉아','따뜻한 한 잔을 나눕니다','이 카페가 좋습니다'],
+    activity:['함께라 더 용감해집니다','두 사람의 도전','나란히 서서'],
+    sunset: ['노을 아래 둘이서','가장 예쁜 시간에','빛이 물드는 순간'],
+    night:  ['밤의 {t}도 좋습니다','불빛 아래 걷습니다','밤이 더 로맨틱합니다'],
+    close:  ['또 오고 싶습니다','다음 여행도 함께','우리의 {t}, 고마워요'],
+    filler: ['함께여서 행복합니다','이 순간이 전부입니다','눈이 마주쳤습니다',
+             '천천히 걸어도 좋습니다','설레는 하루였습니다','기억에 남을 순간']
+  },
+  healing: {
+    title:  ['{t}에서 쉬어갑니다','{t}, 천천히','느린 {t}','쉼, {t}'],
+    outro:  ['잘 쉬었습니다','다시 일어설 힘을 얻었습니다','또 오겠습니다','충전 완료'],
+    open:   ['여기서 쉬어가겠습니다','아무것도 하지 않아도 됩니다','일단 숨을 쉽니다'],
+    arrive: ['도착만으로도 충분합니다','짐을 내려놓습니다','천천히 시작합니다'],
+    wide:   ['이 풍경이 약이 됩니다','시선을 멀리 두면','아무 생각 없이 봅니다'],
+    sea:    ['파도 소리에 기댑니다','바다 앞에 서면 작아집니다','그냥 보기만 해도 됩니다'],
+    nature: ['숲이 대신 말해줍니다','공기부터 다릅니다','나무 아래서 멈춥니다'],
+    street: ['천천히 걷습니다','서두르지 않아도 됩니다','골목이 품어줍니다'],
+    detail: ['작은 것에 눈이 갑니다','놓쳤던 것들을 봅니다','느리게 보면 다릅니다'],
+    culture:['오래된 것들이 위로가 됩니다','시간이 쌓인 곳에서','조용히 앉아 있습니다'],
+    life:   ['남의 일상이 쉬게 합니다','여기서의 하루는 다릅니다','천천히 흐릅니다'],
+    food:   ['맛있는 것이 힐링입니다','한 그릇의 위로','배부르면 됩니다'],
+    cafe:   ['여기서 아무것도 안 합니다','커피 한 잔으로 충분합니다','멍 때리는 시간'],
+    activity:['억지로 하지 않아도 됩니다','몸이 원하는 대로','즐기면 그만입니다'],
+    sunset: ['노을만 봐도 됩니다','이 시간이 치유입니다','빛이 다독여줍니다'],
+    night:  ['밤이 되어야 쉽니다','불빛이 따뜻합니다','오늘 하루도 잘 버텼습니다'],
+    close:  ['잘 쉬었습니다','또 도망쳐 오겠습니다','몸과 마음이 가벼워졌습니다'],
+    filler: ['아무것도 안 해도 됩니다','이 순간을 누립니다','시간이 느리게 갑니다',
+             '숨을 크게 쉽니다','마음이 말랑해집니다','여기 있어 다행입니다']
+  },
+  vlog: {
+    title:  ['{t} 브이로그','오늘의 {t}','{t} Day','{t} 일상 기록'],
+    outro:  ['오늘 영상 여기까지','좋아요 구독 부탁해요','다음에 또 만나요','{t} 다음편도 올게요'],
+    open:   ['{t} 왔어요','오늘 {t} 왔습니다','첫 장면은 여기서'],
+    arrive: ['도착했습니다','체크인 완료','짐 풀고 나왔어요'],
+    wide:   ['뷰 대박입니다','여기 분위기 봐요','배경이 예쁘죠'],
+    sea:    ['바다 왔어요','물빛이 이렇게 예뻐요','여기서 인생샷 찍었어요'],
+    nature: ['공기가 진짜 달라요','초록초록 힐링됩니다','여기 너무 좋아요'],
+    street: ['골목 탐방 중이에요','여기 분위기 좋죠','구석구석 돌아다녔어요'],
+    detail: ['이거 보셨어요','여기 포인트예요','진짜 예쁘지 않나요'],
+    culture:['역사 공부도 했어요','생각보다 볼게 많아요','설명 들으니 재밌어요'],
+    life:   ['현지인처럼 돌아다녔어요','사람 구경도 재밌어요','분위기 느껴보세요'],
+    food:   ['이거 꼭 드세요','맛집 다녀왔어요','진짜 맛있었어요'],
+    cafe:   ['카페 투어 중이에요','여기 인테리어 봐요','음료도 맛있었어요'],
+    activity:['이거 해봤어요','생각보다 재밌어요','꼭 해보세요'],
+    sunset: ['노을 너무 예쁘죠','골든타임 놓치지 마세요','이 시간에 여기 오세요'],
+    night:  ['야경 보러 나왔어요','밤에 오길 잘했어요','야경 맛집이에요'],
+    close:  ['오늘 영상은 여기까지예요','재밌게 보셨나요','다음에 또 올게요'],
+    filler: ['이런 것도 있어요','여기도 가봤어요','추가로 담아봤어요',
+             '이 장면 너무 좋지 않나요','보너스 컷이에요','이것도 보여드릴게요']
+  },
+  minimal: {
+    title:  ['{t}','{t}.','— {t} —','기록, {t}'],
+    outro:  ['{t}','끝','.','-'],
+    open:   ['{t}','시작','여기'],
+    arrive: ['도착','시작점','첫 장면'],
+    wide:   ['풍경','전경','view'],
+    sea:    ['바다','sea','파도'],
+    nature: ['자연','초록','숲'],
+    street: ['골목','길','street'],
+    detail: ['디테일','클로즈업','포인트'],
+    culture:['역사','문화','공간'],
+    life:   ['일상','사람들','삶'],
+    food:   ['음식','맛','식사'],
+    cafe:   ['카페','커피','쉼'],
+    activity:['체험','활동','도전'],
+    sunset: ['노을','황혼','빛'],
+    night:  ['야경','밤','빛'],
+    close:  ['{t}','끝','마침'],
+    filler: ['순간','장면','기록','포착','담다','남기다','그곳','그때']
+  },
+
 };
 
 const pick = a => a[Math.floor(Math.random() * a.length)];
@@ -2774,7 +2948,11 @@ function photoBaseQuery(){
 
 /* ---------- optional: write the script with Claude ---------- */
 async function makeAiScenario(topic, tone, n, key){
-  const toneName = {emo:'감성적이고 잔잔한', fun:'밝고 활기찬', info:'정보를 전달하는 담백한', cine:'시네마틱하고 절제된'}[tone];
+  const toneName = {
+    emo:'감성적이고 잔잔한', fun:'밝고 활기찬', info:'정보를 전달하는 담백한',
+    cine:'시네마틱하고 절제된', romantic:'로맨틱하고 설레는', healing:'힐링·쉼 느낌의',
+    vlog:'브이로그 스타일의 일상적인', minimal:'미니멀하고 간결한'
+  }[tone] || '자연스러운';
   const prompt =
 `너는 한국 여행 홍보 쇼츠의 카피라이터야. 주제: "${topic}"
 톤: ${toneName}. 장면 수: ${n}개.
@@ -2828,7 +3006,7 @@ async function makeScenario(){
   const topic = $('topic').value.trim();
   if(!topic){ gstat('영상 주제를 입력하세요.'); return null; }
   const tone = $('tone').value;
-  const n = Math.max(2, Math.min(30, +$('sceneCount').value || 6));
+  const n = Math.max(2, Math.min(30, +$('sceneCount').value || 10));
   const key = $('apiKey').value.trim();
 
   if(key){
@@ -3048,7 +3226,7 @@ $('reset').onclick = () => {
 
   $('ratio').value = '16:9';
   applyRatio();
-  $('sceneCount').value = '6';
+  $('sceneCount').value = '10';
   render();
   updateTotal();
   setStatus('초기화됐습니다. 새 영상을 시작하세요.');
