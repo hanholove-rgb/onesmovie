@@ -3,24 +3,27 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>여행 홍보 영상 메이커</title>
+<title>나만 아는 여행, 일상 기록기 · 영상 제작기 교동이</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="영상 제작기 교동이">
 <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjogIuyXrO2WiSDtmY3rs7Qg7JiB7IOBIOuplOydtOy7pCIsICJzaG9ydF9uYW1lIjogIuyYgeyDgSDrqZTsnbTsu6QiLCAiZGVzY3JpcHRpb24iOiAi7IKs7KeEwrfsmIHsg4HsnLzroZwg7Jes7ZaJIO2ZjeuztCDsmIHsg4HsnYQg66eM65Oc64qUIOyVsSIsICJzdGFydF91cmwiOiAiLiIsICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLCAiYmFja2dyb3VuZF9jb2xvciI6ICIjMEMxNjE4IiwgInRoZW1lX2NvbG9yIjogIiMwQzE2MTgiLCAib3JpZW50YXRpb24iOiAicG9ydHJhaXQtcHJpbWFyeSIsICJsYW5nIjogImtvIiwgImljb25zIjogW3sic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjRiV3h1Y3owaWFIUjBjRG92TDNkM2R5NTNNeTV2Y21jdk1qQXdNQzl6ZG1jaUlIWnBaWGRDYjNnOUlqQWdNQ0ExTVRJZ05URXlJajQ4Y21WamRDQjNhV1IwYUQwaU5URXlJaUJvWldsbmFIUTlJalV4TWlJZ2NuZzlJamsySWlCbWFXeHNQU0lqTUVNeE5qRTRJaTgrUEhKbFkzUWdlRDBpTnpJaUlIazlJakU0TUNJZ2QybGtkR2c5SWpNMk9DSWdhR1ZwWjJoMFBTSXlNVFlpSUhKNFBTSXhPQ0lnWm1sc2JEMGlibTl1WlNJZ2MzUnliMnRsUFNJak5FVkRSRU0wSWlCemRISnZhMlV0ZDJsa2RHZzlJakl5SWk4K1BIQnZiSGxuYjI0Z2NHOXBiblJ6UFNJeU1qQXNNak15SURJeU1Dd3pOREFnTXpNeUxESTROaUlnWm1sc2JEMGlJelJGUTBSRE5DSXZQanhqYVhKamJHVWdZM2c5SWpJMU5pSWdZM2s5SWpFd09DSWdjajBpTXpBaUlHWnBiR3c5SWlOR04wSTNNekVpTHo0OEwzTjJaejQ9IiwgInNpemVzIjogIjUxMng1MTIiLCAidHlwZSI6ICJpbWFnZS9zdmcreG1sIiwgInB1cnBvc2UiOiAiYW55IG1hc2thYmxlIn1dfQ==">
-<meta name="theme-color" content="#0C1618">
+<meta name="theme-color" content="#EAF6FF">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:#F7F9FC;
+  --ink:#F0F8FF;        /* 아주 연한 하늘 */
   --ink-2:#FFFFFF;
-  --ink-3:#F3F6FA;
-  --line:#D9E2EC;
-  --sun:#FFB800;
-  --sea:#4F8CFF;
-  --paper:#17212B;
-  --mute:#6B7785;
+  --ink-3:#F5FAFF;
+  --line:#CDE4F5;       /* 파스텔 하늘 테두리 */
+  --sun:#FFD43B;        /* 병아리 노랑 */
+  --sea:#6BB6E8;        /* 부드러운 하늘색 */
+  --paper:#3D4B5C;      /* 진한 남회색 (본문) */
+  --mute:#8A9BAD;
+  --blush:#FFD9E1;      /* 볼터치 분홍 */
+  --cream:#FFF9E6;      /* 크림 */
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{
@@ -30,25 +33,104 @@ body{
   font-size:14px;
   line-height:1.6;
   padding:0 0 80px;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255,212,59,.10) 0 42px, transparent 43px),
+    radial-gradient(circle at 88% 12%, rgba(107,182,232,.12) 0 56px, transparent 57px),
+    radial-gradient(circle at 78% 74%, rgba(255,217,225,.16) 0 48px, transparent 49px),
+    radial-gradient(circle at 22% 88%, rgba(107,182,232,.09) 0 38px, transparent 39px),
+    linear-gradient(180deg, #F7FCFF 0%, #FFFDF5 100%);
+  background-attachment:fixed;
 }
+
+/* 아기자기 점무늬 오버레이 */
+body::before{
+  content:'';
+  position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image:
+    radial-gradient(circle, rgba(107,182,232,.16) 1.5px, transparent 1.6px),
+    radial-gradient(circle, rgba(255,212,59,.14) 1.5px, transparent 1.6px);
+  background-size:34px 34px, 34px 34px;
+  background-position:0 0, 17px 17px;
+}
+.wrap, header{position:relative; z-index:1}
 header{
-  border-bottom:1px solid var(--line);
-  padding:24px 20px 20px;
-  background:#FFFFFF;
+  padding:22px 20px 20px;
+  background:linear-gradient(135deg, #EAF6FF 0%, #FFF9E6 100%);
+  border-bottom:2px dashed var(--line);
   display:flex;
-  align-items:flex-end;
-  gap:14px;
+  align-items:center;
+  gap:16px;
   flex-wrap:wrap;
 }
 h1{
-  font-family:'Anton',sans-serif;
-  font-size:34px;
-  letter-spacing:.02em;
-  line-height:.95;
-  text-transform:uppercase;
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:26px;
+  font-weight:700;
+  letter-spacing:-.01em;
+  line-height:1.28;
+  color:var(--paper);
+  text-transform:none;
 }
-h1 em{font-style:normal;color:var(--sea)}
-.tag{color:var(--mute);font-size:13px;padding-bottom:5px}
+h1 em{
+  font-style:normal;
+  display:inline-block;
+  margin-top:5px;
+  font-size:20px;
+  color:#4A94C9;
+  background:var(--cream);
+  padding:3px 12px;
+  border-radius:14px;
+  border:1.5px solid var(--sun);
+}
+.tag{
+  color:var(--mute);
+  font-size:12.5px;
+  background:rgba(255,255,255,.72);
+  padding:7px 13px;
+  border-radius:14px;
+  border:1px solid var(--line);
+}
+
+/* 오리지널 병아리 마스코트 (CSS 로만 그림) */
+.mascot{
+  width:62px; height:62px; position:relative; flex-shrink:0;
+  animation:bob 2.6s ease-in-out infinite;
+}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.mascot .body{
+  position:absolute; left:6px; top:10px; width:50px; height:46px;
+  background:linear-gradient(165deg,#FFE896,#FFD43B);
+  border:2.5px solid #F0B400; border-radius:50% 50% 46% 46%;
+}
+.mascot .tuft{
+  position:absolute; left:26px; top:2px; width:10px; height:13px;
+  background:#FFD43B; border:2.5px solid #F0B400;
+  border-radius:50% 50% 40% 40%; transform:rotate(-12deg);
+}
+.mascot .eye{
+  position:absolute; top:26px; width:6px; height:7px;
+  background:#3D4B5C; border-radius:50%;
+}
+.mascot .eye.l{left:20px} .mascot .eye.r{left:36px}
+.mascot .cheek{
+  position:absolute; top:33px; width:8px; height:5px;
+  background:var(--blush); border-radius:50%; opacity:.85;
+}
+.mascot .cheek.l{left:13px} .mascot .cheek.r{left:41px}
+.mascot .beak{
+  position:absolute; left:28px; top:33px; width:7px; height:6px;
+  background:#FF9F43; border-radius:0 0 50% 50%;
+}
+.mascot .foot{
+  position:absolute; top:54px; width:7px; height:5px;
+  background:#FF9F43; border-radius:0 0 40% 40%;
+}
+.mascot .foot.l{left:19px} .mascot .foot.r{left:36px}
+.mascot::after{
+  content:'✨'; position:absolute; right:-6px; top:-2px; font-size:13px;
+  animation:twinkle 1.8s ease-in-out infinite;
+}
+@keyframes twinkle{0%,100%{opacity:.35;transform:scale(.85)}50%{opacity:1;transform:scale(1.1)}}
 .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
 .grid{display:grid;grid-template-columns:1fr 380px;gap:26px;margin-top:26px}
 @media(max-width:900px){.grid{grid-template-columns:1fr}}
@@ -63,7 +145,9 @@ h1 em{font-style:normal;color:var(--sea)}
   .wrap{padding:12px}
   .grid{gap:12px}
   .panel{padding:13px;border-radius:10px}
-  h1{font-size:22px}
+  h1{font-size:20px}
+  .mascot{width:50px;height:50px}
+  header{padding:16px 14px 14px;gap:11px}
   /* iOS 는 16px 미만 입력칸에 초점이 가면 화면을 확대한다 */
   input,select,textarea,button{font-size:16px}
   input[type=text],input[type=number],input[type=password],select{padding:11px 12px}
@@ -77,55 +161,95 @@ h1 em{font-style:normal;color:var(--sea)}
   .clip img{width:64px;height:64px}
   .iconbtn{min-width:38px;min-height:38px}
   .stage{position:static}
-  canvas{max-height:58vh}
+  #stage{max-height:56vh}
   .sline{grid-template-columns:1fr}
   .sline span{text-align:left}
 }
 @media(max-width:640px) and (orientation:landscape){
-  canvas{max-height:78vh}
+  #stage{max-height:72vh}
 }
 
-.panel{background:var(--ink-2);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 4px 18px rgba(23,33,43,.05)}
+.panel{background:var(--ink-2);border:2px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 4px 16px rgba(107,182,232,.10)}
 .panel + .panel{margin-top:16px}
 .panel h2{
-  font-family:'Anton',sans-serif;font-size:15px;letter-spacing:.09em;
-  text-transform:uppercase;color:var(--sun);margin-bottom:14px;font-weight:400;
+  font-family:'Noto Sans KR',sans-serif;font-size:14px;letter-spacing:0;
+  text-transform:none;color:#4A94C9;margin-bottom:14px;font-weight:700;
+  display:flex;align-items:center;gap:6px;
+}
+.panel h2::before{
+  content:''; width:9px; height:9px; flex-shrink:0;
+  background:var(--sun); border:1.5px solid #F0B400; border-radius:50%;
 }
 label{display:block;font-size:12px;color:var(--mute);margin-bottom:5px}
 input[type=text],input[type=number],input[type=password],select,textarea{
-  width:100%;background:var(--ink);border:1px solid var(--line);color:var(--paper);
+  width:100%;background:var(--ink);border:2px solid var(--line);color:var(--paper);
   border-radius:6px;padding:9px 11px;font-family:inherit;font-size:13px;
 }
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--sea)}
 button{
-  background:var(--sea);color:#fff;border:none;border-radius:6px;
-  padding:10px 16px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;
+  background:var(--sea);color:#fff;border:none;border-radius:14px;
+  padding:10px 17px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;
+  box-shadow:0 2px 0 #4A94C9;transition:transform .12s,box-shadow .12s;
 }
+button:active{transform:translateY(2px);box-shadow:0 0 0 #4A94C9}
 button:hover{filter:brightness(1.04);transform:translateY(-1px)}
 button:disabled{opacity:.4;cursor:not-allowed}
-button.ghost{background:#FFFFFF;color:var(--paper);border:1px solid var(--line);font-weight:500}
-button.ghost:hover{border-color:var(--sea);filter:none}
+button.ghost{background:#FFFFFF;color:var(--paper);border:2px solid var(--line);font-weight:600;box-shadow:0 2px 0 var(--line)}
+button.ghost:hover{border-color:var(--sea);box-shadow:0 2px 0 var(--sea);filter:none}
 .row{display:flex;gap:8px;align-items:flex-end}
 .row > *{flex:1}
 .row > button{flex:0 0 auto}
 
 #stage{
-  position:relative;background:#0F1720;border:1px solid var(--line);
-  border-radius:10px;overflow:hidden;aspect-ratio:16/9;
+  position:relative;background:#0F1720;border:2px solid var(--line);
+  border-radius:14px;overflow:hidden;
+  aspect-ratio:9/16;                 /* 기본 세로. JS 가 비율에 맞춰 덮어쓴다 */
+  max-height:62vh;                   /* 화면을 넘지 않게 */
+  margin:0 auto;                     /* 가운데 정렬 */
+  width:100%;
 }
-#canvas{width:100%;height:100%;display:block}
+/* 캔버스는 비율을 유지하면서 무대 안에 온전히 들어간다 */
+#canvas{
+  width:100%; height:100%;
+  object-fit:contain;                /* 잘리지 않게 */
+  display:block;
+}
 .controls{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
 .time{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:.04em;color:var(--sun)}
 .time small{color:var(--mute);font-size:13px;font-family:'Noto Sans KR'}
 
 .results{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:7px;margin-top:12px;max-height:360px;overflow-y:auto}
-.results img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:5px;cursor:pointer;border:2px solid transparent}
-.results img:hover{border-color:var(--sun)}
+.thumb-wrap{position:relative;cursor:pointer;border-radius:10px;overflow:hidden;line-height:0}
+.thumb-wrap img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;border:2px solid transparent;display:block}
+.thumb-wrap:hover img{border-color:var(--sun)}
+
+/* 이미 쓴 사진 */
+.used-badge{
+  display:none;position:absolute;left:4px;bottom:4px;
+  background:rgba(74,148,201,.94);color:#fff;
+  font-size:9.5px;font-weight:700;line-height:1;
+  padding:3px 6px;border-radius:8px;letter-spacing:.02em;
+}
+.thumb-wrap.is-used img{
+  border-color:var(--sea);
+  filter:grayscale(.55) brightness(.72);
+}
+.thumb-wrap.is-used{cursor:not-allowed}
+.thumb-wrap.is-used .used-badge{display:block}
+.thumb-wrap.is-used:hover img{border-color:var(--sea)}
+
+/* 중복 클릭 시 흔들림 */
+.thumb-wrap.dup-flash img{border-color:#FF8787;animation:shakeX .4s}
+@keyframes shakeX{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-4px)}
+  75%{transform:translateX(4px)}
+}
 
 #clips{display:flex;flex-direction:column;gap:9px;margin-top:12px}
 .clip{
   display:grid;grid-template-columns:18px 74px 1fr auto;gap:11px;align-items:center;
-  background:var(--ink-3);border:1px solid var(--line);border-radius:8px;padding:9px;
+  background:var(--ink-3);border:2px solid var(--line);border-radius:16px;padding:10px;
   transition:opacity .15s,transform .12s;
 }
 .clip.dragging{opacity:.35;transform:scale(.98)}
@@ -136,9 +260,16 @@ button.ghost:hover{border-color:var(--sea);filter:none}
   user-select:none;touch-action:none;
 }
 .drag-handle:active{cursor:grabbing}
-.clip img{width:74px;height:50px;object-fit:cover;border-radius:4px}
-.clip video.thumb{width:74px;height:50px;object-fit:cover;border-radius:4px;display:block}
+.clip img{width:74px;height:50px;object-fit:cover;border-radius:10px}
+.clip video.thumb{width:74px;height:50px;object-fit:cover;border-radius:10px;display:block}
 .clip-type{font-size:10px;font-weight:700;padding:2px 5px;border-radius:4px;letter-spacing:.03em}
+.miniact{
+  padding:4px 9px;font-size:10.5px;font-weight:600;border-radius:10px;
+  background:#fff;color:#4A94C9;border:1.5px solid var(--line);
+  box-shadow:0 1.5px 0 var(--line);white-space:nowrap;
+}
+.miniact:hover{border-color:var(--sea);box-shadow:0 1.5px 0 var(--sea)}
+.miniact:disabled{opacity:.45}
 .clip-type.photo{background:rgba(78,205,196,.18);color:var(--sea)}
 .clip-type.video{background:rgba(247,183,49,.18);color:var(--sun)}
 .trim{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px}
@@ -154,8 +285,13 @@ button.ghost:hover{border-color:var(--sea);filter:none}
 .empty{color:var(--mute);font-size:13px;text-align:center;padding:26px 10px;border:1px dashed var(--line);border-radius:8px;margin-top:12px}
 .hint{color:var(--mute);font-size:11.5px;margin-top:6px;line-height:1.5}
 .hint a{color:var(--sea)}
-.bar{height:5px;background:var(--ink);border-radius:3px;overflow:hidden;margin-top:10px}
-.bar div{height:100%;background:var(--sea);width:0;transition:width .2s}
+.bar{position:relative;height:22px;background:transparent;border-radius:3px;margin-top:10px;cursor:pointer;user-select:none}
+.bar-track{position:absolute;top:8px;left:0;right:0;height:6px;background:var(--ink);border-radius:3px;overflow:hidden}
+.bar-track div{height:100%;background:var(--sea);width:0}
+.bar-handle{position:absolute;top:3px;width:16px;height:16px;background:var(--sea);border:2px solid var(--paper);border-radius:50%;transform:translateX(-50%);pointer-events:none;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+.bar-marks{position:absolute;top:8px;left:0;right:0;height:6px;pointer-events:none}
+.bar-marks span{position:absolute;top:0;width:1.5px;height:6px;background:rgba(255,255,255,.32)}
+.time-row{display:flex;justify-content:space-between;font-size:11px;color:var(--mute);margin-top:3px}
 .status{font-size:12px;color:var(--mute);margin-top:8px;min-height:18px}
 .fields{display:grid;gap:11px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:9px}
@@ -188,8 +324,16 @@ details .fields{margin-top:10px}
 <body>
 
 <header>
-  <h1>한교동의 여행 홍보<br><br><em>영상 메이커</em></h1>
-  <div class="tag">로그인 없이 사진·음원을 찾고, 최대 1분 쇼츠로 내보냅니다</div>
+  <div class="mascot" aria-hidden="true">
+    <div class="tuft"></div>
+    <div class="body"></div>
+    <div class="cheek l"></div><div class="cheek r"></div>
+    <div class="eye l"></div><div class="eye r"></div>
+    <div class="beak"></div>
+    <div class="foot l"></div><div class="foot r"></div>
+  </div>
+  <h1>나만 아는 여행,<br>일상 기록기<br><em>영상 제작기 교동이</em></h1>
+  <div class="tag">📷 사진·영상 올리고 ✍️ 자막에 🎵 음악까지, 쇼츠 한 편 완성!</div>
 </header>
 
 <div class="wrap">
@@ -198,39 +342,55 @@ details .fields{margin-top:10px}
   <!-- LEFT: preview + clips -->
   <div>
     <div class="panel">
-      <h2>미리보기</h2>
+      <h2>🎬 미리보기</h2>
       <div id="stage"><canvas id="canvas" width="1280" height="720"></canvas></div>
       <audio id="remoteAudio" crossorigin="anonymous" preload="auto" style="display:none"></audio>
       <div class="controls">
-        <button id="play">재생</button>
-        <button id="export" class="ghost">영상 내보내기</button>
-        <button id="reset" class="ghost" title="모든 장면·설정을 초기화합니다" style="background:rgba(255,100,100,.08);border-color:rgba(255,100,100,.3);color:#ff6b6b">↺ 초기화</button>
+        <button id="play">▶️ 재생</button>
+        <button id="export" class="ghost">💾 영상 내보내기</button>
+        <button id="reset" class="ghost" title="모든 장면·설정을 초기화합니다" style="background:rgba(255,100,100,.08);border-color:rgba(255,100,100,.3);color:#ff6b6b">🔄 초기화</button>
         <div id="result" class="result"></div>
         <div class="time" id="total">0.0s <small>/ 최대 60s</small></div>
       </div>
-      <div class="bar"><div id="prog"></div></div>
+      <div class="bar" id="seekbar">
+        <div class="bar-track"><div id="prog"></div></div>
+        <div class="bar-marks" id="seekMarks"></div>
+        <div class="bar-handle" id="seekHandle" style="left:0"></div>
+      </div>
+      <div class="time-row"><span id="curTime">0.0s</span><span id="endTime">0.0s</span></div>
       <div class="status" id="status"></div>
     </div>
 
     <div class="panel">
-      <h2>장면 순서</h2>
+      <h2>🗂️ 장면 순서</h2>
+      <button class="ghost" id="allCapToPhoto" type="button" style="width:100%;font-size:12px;padding:9px;margin-bottom:10px">🔍 모든 자막에 맞는 사진 찾기</button>
+      <div style="display:flex;flex-direction:column;gap:6px;margin:0 0 11px">
+        <label style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--mute);margin:0;cursor:pointer">
+          <input type="checkbox" id="mediaOnlyMove" checked style="width:auto;margin:0;accent-color:var(--sun)">
+          <span>사진·영상만 이동 <span style="color:var(--paper)">(자막·효과는 자리에 유지)</span></span>
+        </label>
+        <label style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--mute);margin:0;cursor:pointer">
+          <input type="checkbox" id="photoOnlyMove" style="width:auto;margin:0;accent-color:var(--sea)">
+          <span>같은 종류끼리만 (사진↔사진, 영상↔영상)</span>
+        </label>
+      </div>
       <div id="clips"></div>
-      <div class="empty" id="empty">아직 장면이 없습니다. 오른쪽에서 사진을 검색하거나 직접 올려보세요.</div>
+      <div class="empty" id="empty">🐣 아직 장면이 없어요. 오른쪽에서 사진을 검색하거나 직접 올려보세요!</div>
     </div>
   </div>
 
   <!-- RIGHT: sources + settings -->
   <div>
     <div class="panel">
-      <h2>주제로 시나리오 만들기</h2>
+      <h2>✍️ 주제로 시나리오 만들기</h2>
       <div class="fields">
         <div>
-          <label>영상 주제</label>
+          <label>🌏 영상 주제</label>
           <input type="text" id="topic" placeholder="예: 여수 밤바다 감성 여행" value="여수 밤바다">
         </div>
         <div class="two">
           <div>
-            <label>톤</label>
+            <label>🎭 톤</label>
             <select id="tone">
               <optgroup label="─ 감성">
                 <option value="emo">감성적</option>
@@ -249,34 +409,34 @@ details .fields{margin-top:10px}
             </select>
           </div>
           <div>
-            <label>장면 수</label>
+            <label>🔢 장면 수</label>
             <input type="number" id="sceneCount" value="10" min="2" max="30">
           </div>
         </div>
         <div class="row">
-          <button id="genScript">시나리오 만들기</button>
-          <button class="ghost" id="genAll">사진까지 한 번에</button>
+          <button id="genScript">✨ 시나리오 만들기</button>
+          <button class="ghost" id="genAll">🪄 사진까지 한 번에</button>
         </div>
         <div class="script" id="scriptBox"></div>
         <div class="status" id="gstatus"></div>
-        <div class="hint">타이틀·자막·엔딩 문구를 한 번에 채웁니다. 장면이 이미 있으면 그 개수에 맞춰 씁니다. 여기서 바로 고쳐 쓸 수 있고, 장면을 더 추가하면 순서대로 자막이 들어갑니다.</div>
+        <div class="hint">✨ 타이틀·자막·엔딩 문구를 한 번에 채워요. 장면이 이미 있으면 그 개수에 맞춰 씁니다. 여기서 바로 고쳐 쓸 수 있고, 장면을 더 추가하면 순서대로 자막이 들어갑니다.</div>
 
         <div id="aiKeySection" style="border-top:1px solid var(--line);padding-top:11px;margin-top:3px">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
             <label style="margin:0;flex:1">Claude API 키 <span style="font-size:10px;color:var(--mute)">(선택 · 더 자연스러운 문구)</span></label>
-            <button class="ghost" id="toggleApiKey" style="padding:3px 10px;font-size:12px">설정</button>
+            <button class="ghost" id="toggleApiKey" style="padding:3px 10px;font-size:12px">⚙️ 설정</button>
           </div>
           <div id="apiKeyBox" style="display:none">
             <div class="two" style="margin-bottom:6px">
               <div>
-                <label>API 키</label>
+                <label>🔑 API 키</label>
                 <div style="position:relative">
                   <input type="password" id="apiKey" placeholder="sk-ant-..." style="padding-right:36px">
                   <button id="toggleApiVis" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--mute);cursor:pointer;padding:4px;font-size:13px">👁</button>
                 </div>
               </div>
               <div>
-                <label>모델</label>
+                <label>🤖 모델</label>
                 <select id="apiModel">
                   <option value="claude-sonnet-4-6">Sonnet 4.6 (권장)</option>
                   <option value="claude-haiku-4-5-20251001">Haiku 4.5 (빠름)</option>
@@ -292,14 +452,14 @@ details .fields{margin-top:10px}
     </div>
 
     <div class="panel">
-      <h2>사진 검색 · 로그인 없음</h2>
+      <h2>🔍 사진 검색 · 로그인 없음</h2>
       <div class="fields">
         <div class="row">
           <div>
-            <label>검색어</label>
+            <label>🔎 검색어</label>
             <input type="text" id="q" placeholder="Yeosu, Yeosu Ocean, Yeosu Night" value="Yeosu Korea">
           </div>
-          <button id="search">검색</button><button class="ghost" id="testPhotos" type="button">연결 확인</button>
+          <button id="search">🔍 검색</button><button class="ghost" id="testPhotos" type="button">📡 연결 확인</button>
         </div>
       </div>
       <div class="hint">한글 입력 시 자동으로 영어로 변환합니다(여수 밤바다 → Yeosu night sea). "사진까지 한 번에"를 쓰면 각 장면에 맞는 사진을 자동으로 찾습니다.</div>
@@ -308,20 +468,29 @@ details .fields{margin-top:10px}
     </div>
 
     <div class="panel">
-      <h2>내 사진·영상 올리기</h2>
+      <h2>📸 내 사진·영상 올리기</h2>
       <input type="file" id="upload" accept="image/*,video/*" multiple style="font-size:12px;color:var(--mute)">
-      <div class="hint">사진과 영상을 함께 선택할 수 있습니다. 영상은 시작·끝 구간을 직접 조정할 수 있습니다.</div>
+      <div id="uploadBox" style="display:none;flex-direction:column;gap:7px;margin-top:10px;padding:11px;background:var(--cream);border:2px solid var(--sun);border-radius:14px">
+        <div style="display:flex;align-items:center;gap:9px">
+          <span id="uploadInfo" style="flex:1;font-size:12px;color:var(--paper)">준비 중…</span>
+          <button id="uploadStop" type="button" style="padding:5px 13px;font-size:12px;background:#FF8787;box-shadow:0 2px 0 #E05C5C;white-space:nowrap">✋ 중지</button>
+        </div>
+        <div style="height:6px;background:#fff;border-radius:3px;overflow:hidden">
+          <div id="uploadFill" style="height:100%;width:0;background:var(--sun);transition:width .2s"></div>
+        </div>
+      </div>
+      <div class="hint">🐣 사진과 영상을 함께 선택할 수 있어요. 여러 장을 올리는 중에는 중지 버튼으로 멈출 수 있습니다.</div>
     </div>
 
     <div class="panel">
-      <h2>배경음악 · 로그인 없음</h2>
+      <h2>🎵 배경음악 · 로그인 없음</h2>
       <div class="fields">
         <div class="row">
           <div>
-            <label>분위기 검색</label>
+            <label>🎧 분위기 검색</label>
             <input type="text" id="jq" placeholder="upbeat travel, cinematic" value="upbeat travel">
           </div>
-          <button id="jsearch">검색</button><button class="ghost" id="testAudio" type="button">연결 확인</button>
+          <button id="jsearch">🔍 검색</button><button class="ghost" id="testAudio" type="button">📡 연결 확인</button>
         </div>
       </div>
       <div class="hint">Openverse의 공개 라이선스 음원을 검색합니다. 별도 로그인이나 API 키가 필요하지 않습니다. 음원별 라이선스 조건은 최종 사용 전에 확인하세요.</div>
@@ -330,7 +499,7 @@ details .fields{margin-top:10px}
 
       <div style="border-top:1px solid var(--line);margin:15px 0 12px"></div>
       <div id="synthPanel">
-        <label>인터넷 없이 음악 만들기</label>
+        <label>🎹 인터넷 없이 음악 만들기</label>
         <div class="row">
           <div>
             <select id="mood">
@@ -353,22 +522,22 @@ details .fields{margin-top:10px}
               </optgroup>
             </select>
           </div>
-          <button class="ghost" id="genMusic" type="button">만들기</button>
+          <button class="ghost" id="genMusic" type="button">🎶 만들기</button>
         </div>
-        <div class="hint">브라우저가 직접 소리를 합성합니다. 검색이나 다운로드가 필요 없고, 저작권 걱정 없이 영상에 그대로 씁니다.</div>
+        <div class="hint">🎹 브라우저가 직접 소리를 만들어요. 검색이나 다운로드가 필요 없고, 저작권 걱정 없이 영상에 그대로 씁니다.</div>
       </div>
 
       <div style="border-top:1px solid var(--line);margin:15px 0 12px"></div>
-      <label>또는 내 음악 파일 올리기</label>
+      <label>📁 또는 내 음악 파일 올리기</label>
       <input type="file" id="music" accept="audio/*" style="font-size:12px;color:var(--mute)">
 
       <div class="two" style="margin-top:11px">
         <div>
-          <label>볼륨</label>
+          <label>🔊 볼륨</label>
           <input type="number" id="vol" value="70" min="0" max="100">
         </div>
         <div>
-          <label>시작 지점(초)</label>
+          <label>⏱️ 시작 지점(초)</label>
           <input type="number" id="mstart" value="0" min="0" step="0.5">
         </div>
       </div>
@@ -376,9 +545,9 @@ details .fields{margin-top:10px}
     </div>
 
     <div class="panel">
-      <h2>영상 필터 효과</h2>
+      <h2>🎨 영상 필터 효과</h2>
       <div class="fields">
-        <div><label>전체 영상 필터</label>
+        <div><label>🖼️ 전체 영상 필터</label>
           <select id="filter">
             <option value="none">원본</option>
             <optgroup label="─ 밝기·감성">
@@ -403,39 +572,39 @@ details .fields{margin-top:10px}
             </optgroup>
           </select>
         </div>
-        <div class="two"><div><label>밝기</label><input type="range" id="brightness" min="50" max="150" value="100"></div>
-        <div><label>대비</label><input type="range" id="contrast" min="50" max="160" value="100"></div></div>
-        <div class="two"><div><label>채도</label><input type="range" id="saturation" min="0" max="200" value="100"></div>
-        <div><label>색조</label><input type="range" id="hue" min="-180" max="180" value="0"></div></div>
-        <div class="two"><div><label>흐림</label><input type="range" id="blur" min="0" max="8" value="0" step="0.5"></div>
-        <div><label>비네팅</label><input type="range" id="vignette" min="0" max="100" value="0"></div></div>
-        <div id="tiltRow" style="display:none"><label>틸트쉬프트 강도</label><input type="range" id="tiltStrength" min="1" max="10" value="4" step="0.5"></div>
-        <button class="ghost" id="resetFilter" type="button">필터 초기화</button>
+        <div class="two"><div><label>☀️ 밝기</label><input type="range" id="brightness" min="50" max="150" value="100"></div>
+        <div><label>◐ 대비</label><input type="range" id="contrast" min="50" max="160" value="100"></div></div>
+        <div class="two"><div><label>🌈 채도</label><input type="range" id="saturation" min="0" max="200" value="100"></div>
+        <div><label>🎨 색조</label><input type="range" id="hue" min="-180" max="180" value="0"></div></div>
+        <div class="two"><div><label>💭 흐림</label><input type="range" id="blur" min="0" max="8" value="0" step="0.5"></div>
+        <div><label>🌑 비네팅</label><input type="range" id="vignette" min="0" max="100" value="0"></div></div>
+        <div id="tiltRow" style="display:none"><label>🔭 틸트쉬프트 강도</label><input type="range" id="tiltStrength" min="1" max="10" value="4" step="0.5"></div>
+        <button class="ghost" id="resetFilter" type="button">🔄 필터 초기화</button>
       </div>
-      <div class="hint">필터는 미리보기와 최종 영상에 동일하게 적용됩니다. 틸트쉬프트는 프리셋 메뉴에서 선택하세요.</div>
+      <div class="hint">🎨 필터는 미리보기와 최종 영상에 똑같이 적용돼요. 틸트쉬프트는 프리셋 메뉴에서 선택하세요.</div>
     </div>
 
     <div class="panel">
-      <h2>영상 설정</h2>
+      <h2>⚙️ 영상 설정</h2>
       <div class="fields">
         <div>
-          <label>오프닝 타이틀</label>
+          <label>🏷️ 오프닝 타이틀</label>
           <input type="text" id="title" placeholder="여수, 바다의 도시">
         </div>
         <div>
-          <label>엔딩 문구</label>
+          <label>🎀 엔딩 문구</label>
           <input type="text" id="outro" placeholder="지금, 여수로">
         </div>
         <div class="two">
           <div>
-            <label>기본 장면 길이(초)</label>
+            <label>⏳ 기본 장면 길이(초)</label>
             <div style="display:flex;gap:6px;align-items:center">
               <input type="number" id="dur" value="1.5" min="0.5" max="60" step="0.5" style="flex:1">
-              <button class="ghost" id="applyDur" type="button" style="white-space:nowrap;padding:6px 10px;font-size:12px">전체 적용</button>
+              <button class="ghost" id="applyDur" type="button" style="white-space:nowrap;padding:6px 10px;font-size:12px">✅ 전체 적용</button>
             </div>
           </div>
           <div>
-            <label>화면 비율</label>
+            <label>📐 화면 비율</label>
             <select id="ratio">
               <option value="9:16" selected>9:16 세로 (쇼츠/릴스)</option>
               <option value="16:9">16:9 가로</option>
@@ -444,7 +613,7 @@ details .fields{margin-top:10px}
           </div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="ghost" id="autofit" style="flex:1">60초에 맞춰 자동 배분</button>
+          <button class="ghost" id="autofit" style="flex:1">⚖️ 60초에 맞춰 자동 배분</button>
           <select id="bulkDurPreset" style="font-size:12px;padding:6px 8px" title="빠른 일괄 설정">
             <option value="">빠른 설정…</option>
             <optgroup label="쇼츠/릴스 (15초)">
@@ -490,17 +659,22 @@ const cv = $('canvas'), cx = cv ? cv.getContext('2d') : null;
 let clips = [], audioBuf = null, audioCtx = null, remoteAudio = null, remoteAudioUrl = '', audioSource = null;
 let scenario = null;
 
-const TRANSITIONS = {
-  cut:'컷', fade:'페이드', slide:'슬라이드', zoom:'줌인', flash:'플래시'
-};
-
 /* ---------- ratio ---------- */
 function applyRatio(){
   const r = $('ratio').value;
   const map = {'16:9':[1280,720],'9:16':[720,1280],'1:1':[900,900]};
   const [w,h] = map[r];
   cv.width = w; cv.height = h;
-  $('stage').style.aspectRatio = r.replace(':','/');
+
+  const stage = $('stage');
+  stage.style.aspectRatio = r.replace(':','/');
+
+  /* 세로·정사각은 폭을 줄여야 화면 높이를 넘지 않는다.
+     그렇지 않으면 무대가 아래로 길어져 미리보기가 잘려 보인다. */
+  if(r === '9:16')      stage.style.maxWidth = '340px';
+  else if(r === '1:1')  stage.style.maxWidth = '520px';
+  else                  stage.style.maxWidth = '100%';
+
   draw(0);
 }
 $('ratio').onchange = applyRatio;
@@ -744,11 +918,6 @@ function shorterQueries(q){
 }
 
 /* 자동 채우기에서 쓰는 얇은 래퍼 */
-async function fetchPhotos(query, limit){
-  const r = await photoSearch(query, limit || 8, 0);
-  return r.items;
-}
-
 let offlineNotified = false;
 
 function highlightOffline(){
@@ -794,20 +963,55 @@ function showPhotos(items, append){
   const box = $('results');
   if(!append) box.innerHTML = '';
   items.forEach(p => {
+    const wrap = document.createElement('div');
+    wrap.className = 'thumb-wrap';
+    wrap.dataset.url = p.url;
+
     const im = new Image();
     im.crossOrigin = 'anonymous';
     im.src = p.url;
     im.alt = p.credit || '';
     im.title = p.credit || '';
-    im.onclick = () => addClip(p.url, p.credit || '');
-    box.appendChild(im);
+
+    const badge = document.createElement('span');
+    badge.className = 'used-badge';
+    badge.textContent = '✓ 사용중';
+
+    wrap.appendChild(im);
+    wrap.appendChild(badge);
+    wrap.onclick = () => {
+      if(isDuplicateUrl(p.url)){
+        setStatus('🔁 이미 사용 중인 사진이에요. 다른 사진을 골라주세요.');
+        return;
+      }
+      addClip(p.url, p.credit || '');
+    };
+    box.appendChild(wrap);
   });
+  markUsedThumbs();
+}
+
+/* 이미 쓴 사진에 표시를 켠다 */
+function markUsedThumbs(){
+  const box = $('results');
+  if(!box) return;
+  box.querySelectorAll('.thumb-wrap').forEach(wrap => {
+    wrap.classList.toggle('is-used', isDuplicateUrl(wrap.dataset.url));
+  });
+}
+
+/* 중복 클릭 시 해당 썸네일을 잠깐 강조 */
+function flashUsedThumb(url){
+  const wrap = $('results') && $('results').querySelector('.thumb-wrap[data-url="' + CSS.escape(url) + '"]');
+  if(!wrap) return;
+  wrap.classList.add('dup-flash');
+  setTimeout(() => wrap.classList.remove('dup-flash'), 700);
 }
 
 async function searchPhotos(reset){
   if(reset === undefined) reset = true;
   const typed = $('q').value.trim();
-  if(!typed){ setStatus('검색어를 입력하세요.'); return; }
+  if(!typed){ setStatus('🔎 검색어를 입력해주세요.'); return; }
 
   if(reset){ photoPage = 0; photoQueryUsed = ''; $('results').innerHTML = ''; }
   $('search').disabled = true;
@@ -821,7 +1025,7 @@ async function searchPhotos(reset){
       qTouched = true;
     }
   }
-  setStatus('사진 검색 중…');
+  setStatus('🔍 사진 검색 중…');
 
   try{
     const cands = (!reset && photoQueryUsed) ? [photoQueryUsed] : shorterQueries(q);
@@ -848,7 +1052,7 @@ async function searchPhotos(reset){
     if(q !== typed) how += ' · "' + typed + '" → "' + q + '"';
     if(r.query && r.query !== q) how += ' · 결과가 없어 "' + r.query + '" 로 줄여 검색';
     setStatus((reset ? '' : '추가 ') + r.items.length + '장 · ' + r.source + how
-      + ' · 사진을 눌러 장면에 추가하세요.');
+      + ' · 👆 사진을 눌러 장면에 추가하세요.');
   }catch(e){
     console.error(e);
     setStatus('사진 검색 중 오류: ' + e.message);
@@ -892,17 +1096,52 @@ $('q').addEventListener('keydown', e => {
   if(e.key === 'Enter') searchPhotos(true);
 });
 
+let uploadCancel = false;
+
 $('upload').onchange = async e => {
   const files = [...e.target.files];
   e.target.value = '';
+  if(!files.length) return;
+
+  uploadCancel = false;
+  $('uploadBox').style.display = 'flex';
+  $('upload').disabled = true;
+
+  let done = 0, failed = 0, dups = 0;
   for(const f of files){
-    const url = URL.createObjectURL(f);
-    if(f.type.startsWith('video/')){
-      await addVideoClip(url, f.name);
-    } else {
-      await addClip(url, '');
+    if(uploadCancel){
+      setStatus('✋ 업로드를 중지했어요. ' + done + '개 추가됨.');
+      break;
     }
+    $('uploadInfo').textContent = (done + 1) + ' / ' + files.length + '  ' + f.name.slice(0, 22);
+    $('uploadFill').style.width = (done / files.length * 100) + '%';
+
+    const url = URL.createObjectURL(f);
+    let ok;
+    try{
+      ok = f.type.startsWith('video/')
+        ? await addVideoClipAsync(url, f.name)
+        : await addClipAsync(url, '');
+    }catch(err){ ok = false; }
+    if(ok === 'dup') dups++;
+    else if(ok) done++;
+    else failed++;
   }
+
+  $('uploadFill').style.width = '100%';
+  $('upload').disabled = false;
+  setTimeout(() => { $('uploadBox').style.display = 'none'; }, 500);
+
+  if(!uploadCancel){
+    setStatus(done + '개를 장면에 추가했어요! 🎉'
+      + (dups   ? ' 🔁 ' + dups + '개는 이미 있어 건너뜀.' : '')
+      + (failed ? ' ⚠️ ' + failed + '개는 불러오지 못했어요.' : ''));
+  }
+};
+
+$('uploadStop').onclick = () => {
+  uploadCancel = true;
+  $('uploadInfo').textContent = '중지 중…';
 };
 
 $('music').onchange = async e => {
@@ -982,7 +1221,7 @@ function renderTracks(list, append=false){
 
 async function searchTracks(reset=true){
   const typed = $('jq').value.trim();
-  if(!typed){ mstat('검색어를 입력하세요.'); return; }
+  if(!typed){ mstat('🎧 검색어를 입력해주세요.'); return; }
 
   let q = typed;
   if(HANGUL.test(typed)){
@@ -1169,8 +1408,7 @@ const MOODS = {
   pop:     {bpm:128, chords:[[60,64,67],[65,69,72],[57,60,64],[62,65,69]], pad:'triangle', arp:'triangle', arpGain:0.09,  kick:true,  cutoff:6000},
   nature:  {bpm:60,  chords:[[60,64,67],[57,60,64],[65,69,72],[62,65,69]], pad:'sine',     arp:'sine',     arpGain:0.03,  kick:false, cutoff:3000, nature:true},
   sunset:  {bpm:70,  chords:[[60,64,67],[57,60,64],[55,59,62],[53,57,60]], pad:'triangle', arp:'triangle', arpGain:0.06,  kick:false, cutoff:2800, guitar:true},
-  mystic:  {bpm:76,  chords:[[57,60,64],[60,63,67],[62,65,68],[55,58,62]], pad:'sine',     arp:'sine',     arpGain:0.04,  kick:false, cutoff:2000, mystic:true},
-};
+  mystic:  {bpm:76,  chords:[[57,60,64],[60,63,67],[62,65,68],[55,58,62]], pad:'sine',     arp:'sine',     arpGain:0.04,  kick:false, cutoff:2000, mystic:true}};
 
 const midiHz = n => 440 * Math.pow(2, (n - 69) / 12);
 
@@ -1449,8 +1687,8 @@ async function renderMusic(moodKey, seconds){
 $('genMusic').onclick = async () => {
   const btn = $('genMusic');
   btn.disabled = true;
-  btn.textContent = '만드는 중…';
-  mstat('음악을 합성하는 중…');
+  btn.textContent = '🎶 만드는 중…';
+  mstat('🎹 음악을 합성하는 중…');
   try{
     const want = Math.max(20, Math.min(90, totalTime() + 8));
     audioBuf = await renderMusic($('mood').value, want);
@@ -1463,13 +1701,13 @@ $('genMusic').onclick = async () => {
     try{ localStorage.removeItem('yeosu_selected_track'); }catch(e){}
     musicCredit = '브라우저에서 만든 음악 · ' + $('mood').selectedOptions[0].textContent;
     document.querySelectorAll('.track').forEach(x => x.classList.remove('on'));
-    mstat('음악 준비됨 · ' + audioBuf.duration.toFixed(1) + '초 · ' + musicCredit + ' · 재생을 눌러 들어보세요.');
+    mstat('🎵 음악 준비됨 · ' + audioBuf.duration.toFixed(1) + '초 · ' + musicCredit + ' · 재생을 눌러 들어보세요.');
   }catch(e){
     console.error(e);
     mstat('음악을 만들지 못했습니다 - ' + e.message);
   }finally{
     btn.disabled = false;
-    btn.textContent = '만들기';
+    btn.textContent = '🎶 만들기';
   }
 };
 
@@ -1489,8 +1727,7 @@ const PRESETS = {
   hdr:       {b:100, c:148, s:135, extra:'saturate(135%) contrast(115%)'},
   mist:      {b:115, c:78,  s:88,  extra:'blur(0.8px) brightness(116%) contrast(78%)'},
   popart:    {b:102, c:125, s:210, extra:'saturate(210%) contrast(118%)'},
-  tilt:      {b:102, c:110, s:108, extra:''},
-};
+  tilt:      {b:102, c:110, s:108, extra:''}};
 
 let filterLocked = false;   // true while a preset is driving the sliders
 
@@ -1580,24 +1817,115 @@ function setupFilterControls(){
   };
 }
 
+let seekPos = -1;   // 사용자가 시크바로 지정한 위치(초). -1이면 자동
+
 function redrawPreview(){
-  if(playing) return;          // playback loop already redraws every frame
+  if(playing) return;
   draw(previewTime());
+  updateSeekUI(previewTime());
 }
 
 function previewTime(){
-  // show the first real photo so filter changes are visible immediately
+  if(seekPos >= 0) return Math.min(seekPos, Math.max(0, totalTime() - 0.05));
+  // 기본: 첫 사진이 보이는 지점 (필터 변화를 즉시 확인)
   return ($('title').value ? 1.6 : 0) + 0.5;
 }
 
+/* 시크바 눈금·핸들·시간 표시 갱신 */
+function updateSeekUI(t){
+  const total = totalTime() || 1;
+  const pct = Math.max(0, Math.min(100, t / total * 100));
+  $('prog').style.width = pct + '%';
+  $('seekHandle').style.left = pct + '%';
+  $('curTime').textContent = t.toFixed(1) + 's';
+  $('endTime').textContent = total.toFixed(1) + 's';
+}
+
+/* 장면 경계 눈금 그리기 */
+function renderSeekMarks(){
+  const box = $('seekMarks');
+  if(!box) return;
+  box.innerHTML = '';
+  const total = totalTime();
+  if(total <= 0) return;
+  let acc = $('title').value ? 1.6 : 0;
+  if(acc > 0){
+    const m = document.createElement('span');
+    m.style.left = (acc / total * 100) + '%';
+    box.appendChild(m);
+  }
+  clips.forEach(c => {
+    acc += clipDuration(c);
+    if(acc < total){
+      const m = document.createElement('span');
+      m.style.left = (acc / total * 100) + '%';
+      box.appendChild(m);
+    }
+  });
+}
+
+/* 시크바 클릭·드래그 */
+(() => {
+  const bar = () => $('seekbar');
+  let dragging = false;
+
+  const seekTo = clientX => {
+    const el = bar();
+    if(!el) return;
+    const r = el.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
+    const total = totalTime();
+    seekPos = ratio * total;
+    if(playing){
+      // 재생 중이면 그 시점으로 점프
+      cancelAnimationFrame(raf);
+      clips.filter(isVideoClip).forEach(c => { try{ c.vid.pause(); }catch(e){} });
+      playLoop(performance.now() - seekPos * 1000, () => {
+        if(previewAudio?.src){ try{ previewAudio.src.stop(); }catch(e){} }
+        previewAudio = null;
+      });
+    } else {
+      draw(previewTime());
+      updateSeekUI(previewTime());
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {}, {once:true});
+
+  const attach = () => {
+    const el = bar();
+    if(!el) return;
+    el.addEventListener('pointerdown', e => {
+      dragging = true;
+      el.setPointerCapture?.(e.pointerId);
+      seekTo(e.clientX);
+    });
+    el.addEventListener('pointermove', e => { if(dragging) seekTo(e.clientX); });
+    el.addEventListener('pointerup',   () => { dragging = false; });
+    el.addEventListener('pointercancel', () => { dragging = false; });
+  };
+  attach();
+})();
+
 /* ---------- clips ---------- */
-function addClipAsync(url, credit){
+/* 이미 타임라인에 있는 사진·영상인지 확인 */
+function isDuplicateUrl(url){
+  if(!url) return false;
+  return clips.some(c => c.url === url);
+}
+
+function addClipAsync(url, credit, opts){
+  // 같은 사진은 두 번 넣지 않는다 (allowDup 이면 통과)
+  if(!(opts && opts.allowDup) && isDuplicateUrl(url)){
+    return Promise.resolve('dup');
+  }
   return new Promise(resolve => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => {
       const s = scenario ? scenario.scenes[clips.length] : null;
       clips.push({
+        type: 'photo',
         img, url, credit,
         text: s ? s.caption : '',
         dur: +$('dur').value,
@@ -1614,6 +1942,11 @@ function addClipAsync(url, credit){
 
 async function addClip(url, credit){
   const ok = await addClipAsync(url, credit);
+  if(ok === 'dup'){
+    setStatus('🔁 이미 사용 중인 사진이에요. 다른 사진을 골라주세요.');
+    flashUsedThumb(url);
+    return;
+  }
   if(ok) setStatus((credit ? credit + ' · ' : '') + '사진이 장면에 추가되었습니다.');
   else setStatus('선택한 이미지를 불러오지 못했습니다. 다른 사진을 선택해보세요.');
 }
@@ -1625,7 +1958,47 @@ function clipDuration(c){
   return isVideoClip(c) ? (c.trimEnd - c.trimStart) : c.dur;
 }
 
+/* 사진·영상 데이터만 서로 바꾼다. 자막·전환효과·길이는 자리에 남는다. */
+const MEDIA_KEYS = ['type','img','vid','url','credit','trimStart','trimEnd'];
+function swapMedia(a, b){
+  const A = clips[a], B = clips[b];
+  if(!A || !B) return;
+
+  // 영상↔사진 교환 시 길이 기준이 달라지므로 보정한다
+  const aWasVideo = isVideoClip(A), bWasVideo = isVideoClip(B);
+  const aDur = clipDuration(A), bDur = clipDuration(B);
+
+  for(const k of MEDIA_KEYS){
+    const tmp = A[k];
+    if(B[k] === undefined) delete A[k]; else A[k] = B[k];
+    if(tmp === undefined) delete B[k]; else B[k] = tmp;
+  }
+
+  /* 길이 처리
+     - 영상이 된 자리: 트림 구간을 그대로 살린다 (영상 원본을 존중)
+     - 사진이 된 자리: 그 자리에 원래 있던 길이를 유지.
+       단 영상 트림 길이를 물려받으면 부자연스러우니 사진 기준으로 되돌린다. */
+  const defaultPhotoDur = Math.max(0.5, +$('dur').value || 2);
+  const fix = (c, prevDurAtSlot, prevWasVideo) => {
+    if(isVideoClip(c)){
+      const native = (c.vid && isFinite(c.vid.duration)) ? c.vid.duration : 5;
+      if(c.trimEnd === undefined || c.trimEnd <= (c.trimStart || 0)){
+        c.trimStart = 0;
+        c.trimEnd = Math.min(native, 30);
+      }
+      c.dur = clipDuration(c);
+    } else {
+      delete c.trimStart; delete c.trimEnd; delete c.vid;
+      // 원래 이 자리가 사진이었으면 그 길이를 유지, 영상이었으면 기본 사진 길이로
+      c.dur = prevWasVideo ? defaultPhotoDur : (prevDurAtSlot || defaultPhotoDur);
+    }
+  };
+  fix(A, aDur, aWasVideo);
+  fix(B, bDur, bWasVideo);
+}
+
 function addVideoClipAsync(url, credit, vid){
+  if(isDuplicateUrl(url)) return Promise.resolve('dup');
   return new Promise(resolve => {
     vid = vid || document.createElement('video');
     vid.crossOrigin = 'anonymous';
@@ -1652,12 +2025,6 @@ function addVideoClipAsync(url, credit, vid){
     vid.addEventListener('error', () => resolve(false));
     vid.src = url;
   });
-}
-
-async function addVideoClip(url, credit, vidEl){
-  const ok = await addVideoClipAsync(url, credit, vidEl);
-  if(ok) setStatus((credit ? credit + ' · ' : '') + '영상이 장면에 추가되었습니다.');
-  else setStatus('영상을 불러오지 못했습니다. 브라우저가 지원하는 형식인지 확인하세요.');
 }
 
 function fmtSec(v){ return Math.floor(v/60) + ':' + String(Math.floor(v%60)).padStart(2,'0'); }
@@ -1707,7 +2074,25 @@ function render(){
 
     const trSel = document.createElement('select');
     trSel.title = '전환 효과';
-    [['fade','페이드'],['zoom','줌인'],['slide','슬라이드'],['flash','플래시']].forEach(([v,l]) => {
+    [
+      ['cut','컷 (효과 없음)'],
+      ['fade','페이드'],
+      ['zoom','줌인'],
+      ['zoomout','줌아웃'],
+      ['kenburns','켄번즈 (서서히 확대)'],
+      ['kenburnsout','켄번즈 축소'],
+      ['slide','슬라이드 →'],
+      ['slideleft','슬라이드 ←'],
+      ['slideup','슬라이드 ↑'],
+      ['slidedown','슬라이드 ↓'],
+      ['wipe','와이프 →'],
+      ['wipeup','와이프 ↑'],
+      ['circle','원형 열림'],
+      ['rotate','회전 등장'],
+      ['blurin','흐림에서 선명'],
+      ['shake','흔들림'],
+      ['flash','플래시']
+    ].forEach(([v,l]) => {
       const o = document.createElement('option');
       o.value = v; o.textContent = l;
       if(c.tr === v) o.selected = true;
@@ -1715,6 +2100,16 @@ function render(){
     });
     trSel.onchange = e => { c.tr = e.target.value; };
     meta.appendChild(trSel);
+
+    /* 🔍 자막으로 사진 찾기 */
+    const findBtn = document.createElement('button');
+    findBtn.className = 'miniact';
+    findBtn.type = 'button';
+    findBtn.textContent = '🔍 자막→사진';
+    findBtn.title = '이 자막에 어울리는 사진을 검색합니다';
+    findBtn.onclick = () => findPhotoForCaption(i);
+    meta.appendChild(findBtn);
+
 
     const info = document.createElement('div');
     info.appendChild(header);
@@ -1774,14 +2169,37 @@ function render(){
 
     const btns = document.createElement('div');
     btns.style.cssText = 'display:flex;flex-direction:column;gap:4px';
+    /* 같은 종류(사진↔사진, 영상↔영상)끼리만 자리를 바꾼다.
+       photoOnly 모드가 켜져 있으면 종류를 건너뛰고 이동한다. */
+    const findSwapTarget = (from, dir) => {
+      const sameKind = $('photoOnlyMove').checked;
+      let j = from + dir;
+      while(j >= 0 && j < clips.length){
+        if(!sameKind || isVideoClip(clips[j]) === isVideoClip(clips[from])) return j;
+        j += dir;
+      }
+      return -1;
+    };
+
     [['↑','up'],['↓','dn'],['×','del']].forEach(([lbl,a]) => {
       const b = document.createElement('button');
       b.className = 'iconbtn'; b.textContent = lbl;
       b.setAttribute('data-a', a);
       b.onclick = () => {
-        if(a==='del') clips.splice(i,1);
-        else if(a==='up' && i>0) [clips[i],clips[i-1]]=[clips[i-1],clips[i]];
-        else if(a==='dn' && i<clips.length-1) [clips[i],clips[i+1]]=[clips[i+1],clips[i]];
+        if(a==='del'){
+          clips.splice(i,1);
+        } else {
+          const dir = a==='up' ? -1 : 1;
+          const j = findSwapTarget(i, dir);
+          if(j < 0){
+            setStatus($('photoOnlyMove').checked
+              ? '같은 종류(사진/영상) 중에 더 이동할 자리가 없습니다.'
+              : '더 이동할 수 없습니다.');
+            return;
+          }
+          if($('mediaOnlyMove').checked) swapMedia(i, j);
+          else [clips[i], clips[j]] = [clips[j], clips[i]];
+        }
         if(clips.length >= 2) $('sceneCount').value = clips.length;
         render(); draw(0); updateTotal();
       };
@@ -1825,8 +2243,17 @@ function render(){
       const from = +e.dataTransfer.getData('text/plain');
       const to   = i;
       if(from === to) return;
-      const [moved] = clips.splice(from, 1);
-      clips.splice(to, 0, moved);
+      // 사진만 이동 모드면 다른 종류로는 못 옮긴다
+      if($('photoOnlyMove').checked && isVideoClip(clips[from]) !== isVideoClip(clips[to])){
+        setStatus('사진만 이동 모드입니다. 사진은 사진끼리, 영상은 영상끼리 옮길 수 있습니다.');
+        return;
+      }
+      if($('mediaOnlyMove').checked){
+        swapMedia(from, to);
+      } else {
+        const [moved] = clips.splice(from, 1);
+        clips.splice(to, 0, moved);
+      }
       if(clips.length >= 2) $('sceneCount').value = clips.length;
       render(); draw(0); updateTotal();
     });
@@ -1866,11 +2293,19 @@ function render(){
       const overClip = over && over.closest('.clip[data-idx]');
       if(overClip){
         const to = +overClip.dataset.idx;
-        if(to !== touchDragIdx){
-          const [moved] = clips.splice(touchDragIdx, 1);
-          clips.splice(to, 0, moved);
+        const okKind = !$('photoOnlyMove').checked
+          || isVideoClip(clips[touchDragIdx]) === isVideoClip(clips[to]);
+        if(to !== touchDragIdx && okKind){
+          if($('mediaOnlyMove').checked){
+            swapMedia(touchDragIdx, to);
+          } else {
+            const [moved] = clips.splice(touchDragIdx, 1);
+            clips.splice(to, 0, moved);
+          }
           if(clips.length >= 2) $('sceneCount').value = clips.length;
           render(); draw(0); updateTotal();
+        } else if(!okKind){
+          setStatus('사진만 이동 모드입니다. 같은 종류끼리만 옮길 수 있습니다.');
         }
       }
       touchDragIdx = null;
@@ -1885,6 +2320,7 @@ function render(){
     }
   });
   updateTotal();
+  markUsedThumbs();
   draw(0);
 }
 
@@ -1950,7 +2386,17 @@ $('bulkDurPreset').onchange = function(){
 };
 
 function updateTotal(){
+  renderSeekMarks();
   const t = totalTime();
+  // 시크바 시간 표시도 함께 갱신 (재생 중이 아니면 현재 미리보기 위치 기준)
+  if(!playing){
+    const cur = Math.min(previewTime(), Math.max(0, t - 0.05));
+    const pct = t > 0 ? Math.max(0, Math.min(100, cur / t * 100)) : 0;
+    $('prog').style.width = pct + '%';
+    $('seekHandle').style.left = pct + '%';
+    $('curTime').textContent = cur.toFixed(1) + 's';
+  }
+  $('endTime').textContent = t.toFixed(1) + 's';
   const hasVideo = clips.some(isVideoClip);
   const limit = hasVideo ? 300 : 60;   // 영상 클립 있으면 5분까지 허용
   $('total').innerHTML = t.toFixed(1) + 's'
@@ -2051,10 +2497,61 @@ function draw(time){
       const p = t/_cdur, fade = 0.4;
       cx.save();
       cx.filter = currentFilter();
-      if(c.tr==='fade')  cx.globalAlpha = t<fade ? t/fade : 1;
-      if(c.tr==='zoom' && t<fade){ const k=1+(1-t/fade)*0.14;
-        cx.translate(W/2,H/2); cx.scale(k,k); cx.translate(-W/2,-H/2); }
-      if(c.tr==='slide' && t<fade) cx.translate(W*(1-t/fade)*0.4, 0);
+      const e = t < fade ? t/fade : 1;      // 0→1 진행도
+      const inv = 1 - e;                     // 1→0
+      switch(c.tr){
+        case 'fade':
+          cx.globalAlpha = e; break;
+        case 'zoom': {
+          const k = 1 + inv*0.14;
+          cx.translate(W/2,H/2); cx.scale(k,k); cx.translate(-W/2,-H/2); break; }
+        case 'zoomout': {
+          const k = 1 - inv*0.12;
+          cx.translate(W/2,H/2); cx.scale(k,k); cx.translate(-W/2,-H/2);
+          cx.globalAlpha = e; break; }
+        case 'slide':
+          if(t<fade) cx.translate(W*inv*0.4, 0); break;
+        case 'slideleft':
+          if(t<fade) cx.translate(-W*inv*0.4, 0); break;
+        case 'slideup':
+          if(t<fade) cx.translate(0, H*inv*0.35); break;
+        case 'slidedown':
+          if(t<fade) cx.translate(0, -H*inv*0.35); break;
+        case 'kenburns': {
+          // 켄번즈: 클립 전체에 걸쳐 서서히 확대 + 이동
+          const kb = 1 + p*0.12;
+          cx.translate(W/2,H/2); cx.scale(kb,kb);
+          cx.translate(-W/2 - p*W*0.03, -H/2 - p*H*0.02); break; }
+        case 'kenburnsout': {
+          const kb = 1.12 - p*0.12;
+          cx.translate(W/2,H/2); cx.scale(kb,kb); cx.translate(-W/2,-H/2); break; }
+        case 'rotate': {
+          const ang = inv * 0.06;
+          cx.translate(W/2,H/2); cx.rotate(ang); cx.scale(1+inv*0.08,1+inv*0.08);
+          cx.translate(-W/2,-H/2); cx.globalAlpha = e; break; }
+        case 'blurin':
+          cx.filter = currentFilter() + ' blur(' + (inv*10).toFixed(1) + 'px)';
+          cx.globalAlpha = e; break;
+        case 'wipe':
+          // 좌→우 와이프
+          cx.beginPath(); cx.rect(0, 0, W*e, H); cx.clip(); break;
+        case 'wipeup':
+          cx.beginPath(); cx.rect(0, H*(1-e), W, H*e); cx.clip(); break;
+        case 'circle': {
+          // 원형으로 열리기
+          const r = Math.hypot(W,H)/2 * e;
+          cx.beginPath(); cx.arc(W/2, H/2, r, 0, Math.PI*2); cx.clip(); break; }
+        case 'shake': {
+          // 짧게 흔들림
+          if(t < 0.3){
+            const amp = (1 - t/0.3) * W * 0.012;
+            cx.translate(Math.sin(t*70)*amp, Math.cos(t*60)*amp*0.6);
+          }
+          break; }
+        case 'cut':
+        default:
+          break;   // 효과 없음
+      }
       if(isVideoClip(c)){
         const vid = c.vid;
         const elapsed = t * (c.trimEnd - c.trimStart) / _cdur;
@@ -2093,7 +2590,7 @@ function playLoop(start, onEnd){
 
   const syncVideo = (t) => {
     let at = t - titleLen;
-    let newVid = null, targetTime = 0, targetDur = 0;
+    let newVid = null, targetTime = 0;
     for(let i = 0; i < clips.length; i++){
       const c = clips[i];
       const dur = clipDuration(c);
@@ -2101,7 +2598,6 @@ function playLoop(start, onEnd){
         if(isVideoClip(c)){
           newVid = c.vid;
           targetTime = c.trimStart + at;
-          targetDur = dur;
         }
         break;
       }
@@ -2122,11 +2618,11 @@ function playLoop(start, onEnd){
     const t = (performance.now() - start) / 1000;
     syncVideo(t);
     draw(t);
-    $('prog').style.width = Math.min(100, t / total * 100) + '%';
+    updateSeekUI(t);
     if(t < total) raf = requestAnimationFrame(step);
     else {
       if(activeVid){ try{ activeVid.pause(); }catch(e){} }
-      playing = false; $('play').textContent = '재생';
+      playing = false; $('play').textContent = '▶️ 재생';
       onEnd && onEnd();
     }
   };
@@ -2140,16 +2636,19 @@ function stopPreviewAudio(){
 }
 
 $('play').onclick = () => {
-  if(!clips.length){ setStatus('장면을 먼저 추가하세요.'); return; }
+  if(!clips.length){ setStatus('🐣 장면을 먼저 추가해주세요.'); return; }
   if(playing){
-    cancelAnimationFrame(raf); playing=false; $('play').textContent='재생';
-    stopPreviewAudio(); return;
+    cancelAnimationFrame(raf); playing=false; $('play').textContent='▶️ 재생';
+    stopPreviewAudio();
+    return;
   }
-  playing = true; $('play').textContent='정지';
+  playing = true; $('play').textContent='⏸️ 정지';
   stopPreviewAudio();
   previewAudio = buildAudio();
   if(!audioBuf) setStatus('배경음악 파일을 넣으면 재생 중에도 함께 들립니다.');
-  playLoop(performance.now(), () => {
+  // 시크바로 지정한 위치가 있으면 거기서부터 재생
+  const startOffset = (seekPos >= 0 && seekPos < totalTime() - 0.1) ? seekPos : 0;
+  playLoop(performance.now() - startOffset * 1000, () => {
     if(previewAudio?.src){ try{ previewAudio.src.stop(); }catch(e){} }
     if(remoteAudio){ try{ remoteAudio.pause(); }catch(e){} }
     previewAudio = null;
@@ -2227,16 +2726,14 @@ function recordingSupport(){
   return '';
 }
 
-let lastVideo = null;   // {blob, name}
 
 function showResult(blob, name){
-  lastVideo = {blob, name};
   const box = $('result');
   box.innerHTML = '';
   box.style.display = 'flex';
 
   const dl = document.createElement('button');
-  dl.textContent = '내려받기';
+  dl.textContent = '⬇️ 내려받기';
   dl.onclick = () => {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -2254,7 +2751,7 @@ function showResult(blob, name){
   if(file && navigator.canShare && navigator.canShare({files: [file]})){
     const sh = document.createElement('button');
     sh.className = 'ghost';
-    sh.textContent = '공유 · 사진에 저장';
+    sh.textContent = '📤 공유 · 사진에 저장';
     sh.onclick = async () => {
       try{ await navigator.share({files: [file], title: $('title').value || '홍보 영상'}); }
       catch(e){ if(e.name !== 'AbortError') setStatus('공유를 열지 못했습니다 - ' + e.message); }
@@ -2266,12 +2763,12 @@ function showResult(blob, name){
   v.src = URL.createObjectURL(blob);
   v.controls = true;
   v.playsInline = true;
-  v.style.cssText = 'width:100%;border-radius:8px;margin-top:8px';
+  v.style.cssText = 'width:100%;border-radius:14px;margin-top:8px';
   box.appendChild(v);
 }
 
 $('export').onclick = () => {
-  if(!clips.length){ setStatus('장면을 먼저 추가하세요.'); return; }
+  if(!clips.length){ setStatus('🐣 장면을 먼저 추가해주세요.'); return; }
   const _hasVideo = clips.some(isVideoClip);
   const _maxSec = _hasVideo ? 300 : 60;
   if(totalTime() > _maxSec + 0.05){
@@ -2285,7 +2782,7 @@ $('export').onclick = () => {
       + '). 아이폰은 iOS 16.4 이상 사파리, 안드로이드는 크롬을 쓰세요.');
     return;
   }
-  if(playing){ cancelAnimationFrame(raf); playing=false; $('play').textContent='재생'; }
+  if(playing){ cancelAnimationFrame(raf); playing=false; $('play').textContent='▶️ 재생'; }
 
   const stream = cv.captureStream(30);
   const audio = buildAudio();
@@ -2307,7 +2804,7 @@ $('export').onclick = () => {
   rec.ondataavailable = e => e.data.size && chunks.push(e.data);
   rec.onerror = e => {
     setStatus('녹화 중 오류가 발생했습니다 - ' + ((e.error && e.error.name) || '알 수 없음'));
-    $('export').disabled = false; $('export').textContent = '영상 내보내기';
+    $('export').disabled = false; $('export').textContent = '💾 영상 내보내기';
   };
   rec.onstop = () => {
     const type = rec.mimeType || mime || 'video/webm';
@@ -2317,10 +2814,10 @@ $('export').onclick = () => {
       setStatus('녹화된 데이터가 없습니다. 다시 시도해 주세요.');
     }else{
       showResult(blob, 'promo-' + Date.now() + '.' + ext);
-      setStatus('완료 · ' + ext.toUpperCase() + ' · ' + (blob.size / 1048576).toFixed(1) + 'MB'
+      setStatus('✅ 완료 · ' + ext.toUpperCase() + ' · ' + (blob.size / 1048576).toFixed(1) + 'MB'
         + (navigator.canShare ? ' · 아래에서 내려받거나 사진 앱에 저장하세요.' : ' · 아래에서 내려받으세요.'));
     }
-    $('export').disabled = false; $('export').textContent = '영상 내보내기';
+    $('export').disabled = false; $('export').textContent = '💾 영상 내보내기';
   };
 
   let wake = null;
@@ -2332,8 +2829,8 @@ $('export').onclick = () => {
   rec.onstop = () => { releaseWake(); prevStop(); };
 
   $('result').style.display = 'none';
-  $('export').disabled = true; $('export').textContent = '녹화 중…';
-  setStatus('녹화 중입니다. 화면을 끄거나 다른 앱으로 넘어가지 마세요.');
+  $('export').disabled = true; $('export').textContent = '🔴 녹화 중…';
+  setStatus('🔴 녹화 중이에요. 화면을 끄거나 다른 앱으로 넘어가지 마세요.');
   rec.start();
   playing = true; $('play').textContent = '정지';
   playLoop(performance.now(), () => {
@@ -2542,9 +3039,7 @@ const LINES = {
     night:  ['야경','밤','빛'],
     close:  ['{t}','끝','마침'],
     filler: ['순간','장면','기록','포착','담다','남기다','그곳','그때']
-  },
-
-};
+  }};
 
 const pick = a => a[Math.floor(Math.random() * a.length)];
 
@@ -2815,24 +3310,24 @@ function makeLocalScenario(topic, tone, n){
 const KO_DICT = {
   // 자연·풍경
   '바다':'sea','밤바다':'night sea','해변':'beach','해수욕장':'beach','해안':'coast','바닷가':'seaside',
-  '섬':'island','항구':'port','부두':'pier','등대':'lighthouse','절벽':'cliff','동굴':'cave',
-  '산':'mountain','계곡':'valley','폭포':'waterfall','숲':'forest','호수':'lake','강':'river',
+  '항구':'port','부두':'pier','등대':'lighthouse','절벽':'cliff','유람선':'boat','어선':'fishing boat','동굴':'cave',
+  '계곡':'valley','폭포':'waterfall','숲속':'forest','숲길':'forest path','호수':'lake',
   '들판':'field','논':'rice field','하늘':'sky','구름':'cloud','별':'night sky',
   '노을':'sunset','일몰':'sunset','일출':'sunrise','새벽':'dawn','야경':'night view','야간':'night',
-  '벚꽃':'cherry blossom','단풍':'autumn leaves','눈':'snow','안개':'fog',
+  '벚꽃':'cherry blossom','단풍':'autumn leaves','들꽃':'wildflower','장미':'rose','유채':'canola flower','안개':'fog',
   '봄':'spring','여름':'summer','가을':'autumn','겨울':'winter',
   // 도시·장소
   '거리':'street','골목':'alley','시장':'market','야시장':'night market','광장':'square',
   '공원':'park','정원':'garden','다리':'bridge','전망대':'observatory','타워':'tower',
   '마을':'village','한옥':'hanok','한옥마을':'hanok village',
-  '사찰':'temple','절':'temple','궁':'palace','궁궐':'palace','성':'fortress','성곽':'fortress wall',
+  '사찰':'temple','궁궐':'palace','성곽':'fortress wall',
   '박물관':'museum','미술관':'art museum','도서관':'library','시청':'city hall',
   '역':'train station','기차역':'train station','공항':'airport','터미널':'bus terminal',
   '온천':'hot spring','캠핑':'camping','캠핑장':'campsite','낚시':'fishing',
-  '케이블카':'cable car','유람선':'cruise ship','배':'boat','기차':'train','자전거':'bicycle',
+  '케이블카':'cable car','기차':'train','자전거':'bicycle',
   // 사람·음식
   '음식':'food','맛집':'restaurant','식당':'restaurant','카페':'cafe','커피':'coffee',
-  '회':'sashimi','해산물':'seafood','포장마차':'street food','전통시장':'traditional market',
+  '해산물':'seafood','포장마차':'street food','전통시장':'traditional market',
   '사람':'people','축제':'festival','공연':'performance','전통':'traditional',
   // 영상·분위기
   '여행':'travel','풍경':'landscape','전경':'panorama','야외':'outdoor','골목길':'alley',
@@ -3004,13 +3499,13 @@ query는 위키미디어 커먼즈에서 그 장면에 어울리는 사진을 �
 
 async function makeScenario(){
   const topic = $('topic').value.trim();
-  if(!topic){ gstat('영상 주제를 입력하세요.'); return null; }
+  if(!topic){ gstat('🌏 영상 주제를 입력해주세요.'); return null; }
   const tone = $('tone').value;
   const n = Math.max(2, Math.min(30, +$('sceneCount').value || 10));
   const key = $('apiKey').value.trim();
 
   if(key){
-    gstat('AI가 시나리오를 쓰는 중…');
+    gstat('🤖 AI가 시나리오를 쓰는 중…');
     try{
       localStorage.setItem('yeosu_api_key', key);
     }catch(e){}
@@ -3032,7 +3527,7 @@ async function makeScenario(){
       'culture':'문화','activity':'체험','healing':'힐링','romantic':'감성','family':'가족',
       'spring':'봄','summer':'여름','autumn':'가을','winter':'겨울','night':'야경','local':'로컬'};
     const detected = (scenario._tags||[]).map(t=>tagNames[t]||t).join(', ');
-    gstat(scenario.scenes.length + '장면 시나리오를 만들었습니다.'
+    gstat(scenario.scenes.length + '장면 시나리오를 만들었어요! ✨'
       + (detected ? ' 감지된 주제: ' + detected : ' (다시 누르면 다른 문구)')
     );
   }
@@ -3090,7 +3585,7 @@ $('genScript').onclick = async () => {
 $('genAll').onclick = async () => {
   const btn = $('genAll');
   btn.disabled = true;
-  btn.textContent = '만드는 중…';
+  btn.textContent = '🎶 만드는 중…';
   try{
     const sc = await makeScenario();
     if(!sc) return;
@@ -3133,20 +3628,33 @@ $('genAll').onclick = async () => {
       const seen = new Set();
       const uniqueCands = cands.filter(c => c && !seen.has(c) && seen.add(c));
 
-      const r = await photoSearchLadder(uniqueCands, 10, 0);
-      let hit = r.items.find(p => !used.has(p.url));
-
-      // 역할 검색으로 못 찾으면 공용 풀에서 보완
-      if(!hit){
-        if(!pool.length){
-          const rp = await photoSearchLadder(shorterQueries(base), 24, 0);
-          pool = rp.items;
+      /* 안 쓴 사진이 나올 때까지 후보 검색어 × 페이지를 훑는다.
+         한 번에 10장만 보면 뒤쪽 장면이 앞 장면과 같은 사진을 집게 된다. */
+      let hit = null;
+      for(const q of uniqueCands){
+        for(let page = 0; page < 3 && !hit; page++){
+          const r = await photoSearch(q, 24, page * 24);
+          if(!r.items || !r.items.length) break;
+          hit = r.items.find(p => !used.has(p.url)) || null;
         }
-        hit = pool.find(p => !used.has(p.url));
+        if(hit) break;
+      }
+
+      // 그래도 못 찾으면 공용 풀을 페이지째 늘려가며 보완
+      if(!hit){
+        for(let page = 0; page < 4 && !hit; page++){
+          if(pool.length <= page * 24){
+            const rp = await photoSearchLadder(shorterQueries(base), 24, page * 24);
+            if(!rp.items || !rp.items.length) break;
+            pool = pool.concat(rp.items);
+          }
+          hit = pool.find(p => !used.has(p.url)) || null;
+        }
       }
       if(!hit) continue;
       used.add(hit.url);
-      await addClipAsync(hit.url, hit.credit);
+      const added = await addClipAsync(hit.url, hit.credit);
+      if(added === 'dup') continue;   // 혹시 모를 중복은 건너뛴다
     }
 
     if(clips.length === start){
@@ -3157,7 +3665,7 @@ $('genAll').onclick = async () => {
         sc.scenes = sc.scenes.slice(0, clips.length);
         renderScript();
       }
-      gstat('장면 ' + clips.length + '개를 채웠습니다.'
+      gstat('장면 ' + clips.length + '개를 채웠어요! 🎬'
         + (clips.length < wanted ? ' 사진이 ' + clips.length + '장만 검색돼 장면 수를 줄였습니다.' : '')
         + ' 사진 출처: ' + (lastPhotoSource || '알 수 없음'));
     }
@@ -3166,7 +3674,7 @@ $('genAll').onclick = async () => {
     gstat('사진을 불러오지 못했습니다. 인터넷 연결을 확인하세요.');
   }finally{
     btn.disabled = false;
-    btn.textContent = '사진까지 한 번에';
+    btn.textContent = '🪄 사진까지 한 번에';
   }
 };
 
@@ -3188,7 +3696,14 @@ try{
 $('reset').onclick = () => {
   if(!confirm('모든 장면, 자막, 설정을 지우고 처음 상태로 돌아갑니다. 계속할까요?')) return;
 
-  if(playing){ cancelAnimationFrame(raf); playing=false; $('play').textContent='재생'; }
+  // 업로드가 진행 중이면 먼저 멈춘다
+  uploadCancel = true;
+  $('uploadBox').style.display = 'none';
+  $('uploadFill').style.width = '0';
+  $('upload').disabled = false;
+  $('upload').value = '';
+
+  if(playing){ cancelAnimationFrame(raf); playing=false; $('play').textContent='▶️ 재생'; }
   clips.filter(isVideoClip).forEach(c => { try{ c.vid.pause(); }catch(e){} });
   clips.length = 0;
   scenario = null;
@@ -3224,12 +3739,13 @@ $('reset').onclick = () => {
     p.style.borderColor = ''; p.style.boxShadow = '';
   });
 
+  seekPos = -1;
   $('ratio').value = '16:9';
   applyRatio();
   $('sceneCount').value = '10';
   render();
   updateTotal();
-  setStatus('초기화됐습니다. 새 영상을 시작하세요.');
+  setStatus('🔄 초기화됐어요. 새 영상을 시작해보세요!');
 };
 
 
@@ -3240,7 +3756,7 @@ $('reset').onclick = () => {
     const box = $('apiKeyBox');
     const open = box.style.display === 'none';
     box.style.display = open ? 'block' : 'none';
-    $('toggleApiKey').textContent = open ? '접기' : '설정';
+    $('toggleApiKey').textContent = open ? '🔽 접기' : '⚙️ 설정';
   };
 
   // 비밀번호 표시/숨기기
@@ -3300,6 +3816,165 @@ function updateApiStatus(key){
   el.textContent = '✓ 키 형식이 맞습니다. 시나리오 만들기를 누르면 AI가 씁니다.';
 }
 
+/* ---------- 자막 ↔ 사진 연결 ---------- */
+
+/* 자막에서 검색에 쓸 만한 낱말만 남긴다.
+   조사·어미·추상어를 걷어내고 명사 위주로 추린다. */
+/* 자막에서 "눈에 보이는 것"만 골라낸다.
+   사진 검색은 시각적 대상이 있어야 잘 되므로, 사전에 있는 낱말만 쓴다. */
+const VISUAL_WORDS = {
+  // 자연·풍경
+  '바다':'sea','파도':'wave','물결':'wave','수평선':'horizon','해변':'beach','모래':'sand',
+  '바닷가':'seaside','섬들':'island','작은섬':'island',
+  '항구':'port','부두':'pier','등대':'lighthouse','절벽':'cliff','유람선':'boat','어선':'fishing boat',
+  '봉우리':'peak','계곡':'valley','폭포':'waterfall','숲속':'forest','숲길':'forest path','나무':'tree','초록':'green nature','풀밭':'grass field','산길':'mountain trail','산봉':'mountain',
+  '벚꽃':'cherry blossom','단풍':'autumn leaves','들꽃':'wildflower','장미':'rose','유채':'canola flower',
+  '호수':'lake','들판':'field','논밭':'rice field','언덕':'hill','강변':'riverside',
+  '하늘':'sky','구름':'cloud','안개':'fog',
+  '노을':'sunset','일몰':'sunset','일출':'sunrise','그림자':'shadow',
+  '불빛':'city lights','야경':'night view','조명':'illumination',
+  // 도시·건물
+  '골목':'alley','거리':'street','계단':'stairs',
+  '다리':'bridge','건물':'building','한옥':'hanok','마을':'village','지붕':'roof',
+  '시장':'market','상점':'shop','카페':'cafe','간판':'sign','타워':'tower','전망대':'observatory',
+  '공원':'park','정원':'garden','광장':'square','벤치':'bench',
+  '사찰':'temple','박물관':'museum','미술관':'art museum',
+  // 음식·사물
+  '음식':'food','해산물':'seafood','커피':'coffee',
+  '한잔':'cup','그릇':'bowl','접시':'plate','식탁':'table',
+  // 사람·활동
+  '사람':'people','걸음':'walking','발걸음':'walking','얼굴':'face',
+  '기차':'train','자전거':'bicycle','케이블카':'cable car'
+};
+
+/* 자막 안에서 시각 낱말을 찾아 영어로 반환 */
+function captionKeywords(text){
+  if(!text) return [];
+  const found = [];
+  // 긴 낱말부터 매칭해서 '벚꽃'이 '꽃'보다 먼저 잡히게 한다
+  const keys = Object.keys(VISUAL_WORDS).sort((a,b) => b.length - a.length);
+  for(const k of keys){
+    if(text.includes(k) && !found.some(f => f.ko.includes(k))){
+      found.push({ko:k, en:VISUAL_WORDS[k]});
+      if(found.length >= 2) break;   // 2개면 충분
+    }
+  }
+  return found.map(f => f.en);
+}
+
+/* 자막 → 사진 검색 */
+async function findPhotoForCaption(idx){
+  const c = clips[idx];
+  if(!c) return;
+  const text = (c.text || '').trim();
+  if(!text){ setStatus('✍️ 먼저 이 장면에 자막을 입력해주세요.'); return; }
+
+  setStatus('🔍 "' + text + '" 에 맞는 사진을 찾는 중…');
+
+  // 자막에서 시각 낱말을 영어로 추출
+  const visualEn = captionKeywords(text);
+
+  // 지명은 주제 또는 검색어 칸에서 (영어로 변환)
+  let place = '';
+  const rawPlace = ($('topic').value || $('q').value || '').trim();
+  if(rawPlace){
+    try{
+      place = HANGUL.test(rawPlace) ? await toEnglishQuery(rawPlace) : rawPlace;
+    }catch(e){ place = rawPlace; }
+  }
+  const placeHead = place.split(/\s+/)[0] || '';
+
+  // 검색어 조합: 중복 낱말은 제거한다
+  const uniq = arr => [...new Set(arr.filter(Boolean))];
+  const cands = [];
+  if(placeHead && visualEn.length) cands.push(uniq([placeHead, ...visualEn]).join(' '));
+  if(placeHead && visualEn[0])     cands.push(uniq([placeHead, visualEn[0]]).join(' '));
+  if(visualEn.length)              cands.push(uniq(visualEn).join(' '));
+  if(visualEn[0])                  cands.push(visualEn[0]);
+  if(placeHead)                    cands.push(placeHead);
+
+  if(!cands.length){
+    setStatus('🔍 자막에서 사진으로 찾을 만한 낱말을 못 찾았어요. "바다", "골목", "노을" 같은 낱말을 넣어보세요.');
+    return;
+  }
+
+  // 현재 장면 자신의 사진은 교체 대상이므로 제외 목록에서 뺀다
+  const used = new Set(clips.filter((x,n) => n !== idx).map(x => x.url));
+
+  /* 후보를 넉넉히 모은다.
+     한 검색어에서 12장만 보면 여러 장면이 같은 사진을 집게 되므로,
+     사다리 후보를 순회하며 안 쓴 사진이 나올 때까지 계속 찾는다. */
+  let hit = null, usedQuery = '';
+  const tryList = uniq(cands);
+  for(const q of tryList){
+    // 한 검색어당 여러 페이지를 훑는다
+    for(let page = 0; page < 3 && !hit; page++){
+      const r = await photoSearch(q, 24, page * 24);
+      if(!r.items || !r.items.length) break;
+      hit = r.items.find(p => !used.has(p.url)) || null;
+      if(hit) usedQuery = (r.query || q);
+    }
+    if(hit) break;
+  }
+
+  if(!hit){
+    setStatus('🔍 "' + tryList[0] + '" 로 찾은 사진이 모두 이미 쓰였어요. 자막 낱말을 바꾸거나 검색어를 조정해보세요.');
+    return;
+  }
+
+  /* URL 을 먼저 확정해 둔다.
+     이미지 로딩은 비동기라서, 여기서 c.url 을 즉시 잡아두지 않으면
+     일괄 실행 시 다음 장면이 아직 옛 URL 을 보고 같은 사진을 고른다. */
+  c.url = hit.url;
+
+  const loaded = await new Promise(resolve => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload  = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = hit.url;
+  });
+
+  if(!loaded){
+    setStatus('사진을 불러오지 못했어요. 다시 시도해보세요.');
+    return;
+  }
+
+  // 이 장면의 사진만 교체 (자막·효과·길이는 유지)
+  delete c.vid; delete c.trimStart; delete c.trimEnd;
+  c.type = 'photo';
+  c.img = loaded;
+  c.credit = hit.credit || '';
+  if(!c.dur || c.dur <= 0) c.dur = Math.max(0.5, +$('dur').value || 2);
+  render(); draw(0); updateTotal();
+  setStatus('✅ ' + (idx+1) + '번 장면 사진 교체 · 검색어 "' + (usedQuery || tryList[0]) + '"');
+}
+
+/* 일괄: 모든 자막으로 사진 찾기 */
+$('allCapToPhoto').onclick = async () => {
+  const targets = clips.map((c,i)=>({c,i})).filter(x => (x.c.text||'').trim());
+  if(!targets.length){ setStatus('✍️ 자막이 입력된 장면이 없어요.'); return; }
+  const btn = $('allCapToPhoto');
+  btn.disabled = true; btn.textContent = '🔍 찾는 중…';
+
+  let ok = 0, n = 0;
+  for(const {i} of targets){
+    n++;
+    setStatus('🔍 ' + n + '/' + targets.length + ' 장면 사진 찾는 중…');
+    try{ await findPhotoForCaption(i); ok++; }catch(e){ console.error(e); }
+  }
+
+  btn.disabled = false; btn.textContent = '🔍 모든 자막에 맞는 사진 찾기';
+
+  // 결과 검증: 혹시 남은 중복이 있으면 알려준다
+  const urls = clips.map(c => c.url);
+  const dup = urls.length - new Set(urls).size;
+  setStatus('✅ ' + ok + '개 장면 사진을 자막에 맞게 바꿨어요! 🎬'
+    + (dup ? ' (사진이 부족해 ' + dup + '개는 겹쳤어요)' : ''));
+};
+
+
+
 /* ---------- PWA ---------- */
 (function(){
   if('serviceWorker' in navigator){
@@ -3324,7 +3999,7 @@ function updateApiStatus(key){
       tip.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1C2B2D;color:#F7F9FC;padding:14px 20px;border-radius:14px;font-size:14px;line-height:1.65;text-align:center;z-index:9999;box-shadow:0 4px 24px rgba(0,0,0,.65);max-width:300px;width:90vw;border:1px solid rgba(78,205,196,.3)';
       tip.innerHTML='&#128247; 홈 화면에 추가하면 앱처럼 쓸 수 있어요.<br><strong>하단 공유 &#9650; &#8594; 홈 화면에 추가</strong>';
       var btn=document.createElement('button');
-      btn.textContent='닫기';
+      btn.textContent='👌 닫기';
       btn.style.cssText='display:block;margin:10px auto 0;background:rgba(78,205,196,.15);border:1px solid rgba(78,205,196,.4);color:#4ECDC4;padding:6px 20px;border-radius:8px;font-size:13px;cursor:pointer';
       btn.onclick=function(){tip.remove();};
       tip.appendChild(btn);
