@@ -157,7 +157,7 @@ h1 em{
   .two{grid-template-columns:1fr}
   .results{grid-template-columns:repeat(3,1fr);max-height:none}
   .results img{height:74px}
-  .clip{grid-template-columns:64px 1fr}
+  .clip{grid-template-columns:16px 22px 60px 1fr auto;gap:7px}
   .clip img{width:64px;height:64px}
   .iconbtn{min-width:38px;min-height:38px}
   .stage{position:static}
@@ -248,7 +248,7 @@ button.ghost:hover{border-color:var(--sea);box-shadow:0 2px 0 var(--sea);filter:
 
 #clips{display:flex;flex-direction:column;gap:9px;margin-top:12px}
 .clip{
-  display:grid;grid-template-columns:18px 74px 1fr auto;gap:11px;align-items:center;
+  display:grid;grid-template-columns:18px 26px 74px 1fr auto;gap:9px;align-items:center;
   background:var(--ink-3);border:2px solid var(--line);border-radius:16px;padding:10px;
   transition:opacity .15s,transform .12s;
 }
@@ -270,6 +270,34 @@ button.ghost:hover{border-color:var(--sea);box-shadow:0 2px 0 var(--sea);filter:
 }
 .miniact:hover{border-color:var(--sea);box-shadow:0 1.5px 0 var(--sea)}
 .miniact:disabled{opacity:.45}
+
+/* 장면 번호 */
+.clip-no{
+  width:26px;height:26px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--sea);color:#fff;
+  font-size:12px;font-weight:700;border-radius:50%;
+  box-shadow:0 1.5px 0 #4A94C9;
+}
+.clip.is-video .clip-no{background:var(--sun);color:#7A5C00;box-shadow:0 1.5px 0 #F0B400}
+
+/* 교체 대상으로 선택된 장면 */
+.clip.selected{
+  border-color:var(--sun);
+  box-shadow:0 0 0 3px rgba(255,212,59,.28);
+  background:var(--cream);
+}
+.clip.selected .clip-no{animation:pulse 1.3s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
+
+/* 선택 안내 배너 */
+.pick-hint{
+  display:none;align-items:center;gap:8px;
+  background:var(--cream);border:2px solid var(--sun);border-radius:14px;
+  padding:9px 12px;margin-bottom:10px;font-size:12px;color:var(--paper);
+}
+.pick-hint.on{display:flex}
+.pick-hint button{padding:4px 11px;font-size:11.5px;margin-left:auto;background:#FF8787;box-shadow:0 2px 0 #E05C5C}
 .clip-type.photo{background:rgba(78,205,196,.18);color:var(--sea)}
 .clip-type.video{background:rgba(247,183,49,.18);color:var(--sun)}
 .trim{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px}
@@ -364,6 +392,10 @@ details .fields{margin-top:10px}
     <div class="panel">
       <h2>🗂️ 장면 순서</h2>
       <button class="ghost" id="allCapToPhoto" type="button" style="width:100%;font-size:12px;padding:9px;margin-bottom:10px">🔍 모든 자막에 맞는 사진 찾기</button>
+      <div class="pick-hint" id="pickHint">
+        <span id="pickHintText">📌 장면 선택됨</span>
+        <button type="button" id="pickCancel">선택 해제</button>
+      </div>
       <div style="display:flex;flex-direction:column;gap:6px;margin:0 0 11px">
         <label style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--mute);margin:0;cursor:pointer">
           <input type="checkbox" id="mediaOnlyMove" checked style="width:auto;margin:0;accent-color:var(--sun)">
@@ -658,6 +690,7 @@ window.addEventListener('error', e => {
 const cv = $('canvas'), cx = cv ? cv.getContext('2d') : null;
 let clips = [], audioBuf = null, audioCtx = null, remoteAudio = null, remoteAudioUrl = '', audioSource = null;
 let scenario = null;
+let selectedClip = null;   // 사진 교체 대상으로 선택된 장면 index
 
 /* ---------- ratio ---------- */
 function applyRatio(){
@@ -980,6 +1013,11 @@ function showPhotos(items, append){
     wrap.appendChild(im);
     wrap.appendChild(badge);
     wrap.onclick = () => {
+      // 장면이 선택돼 있으면 그 장면의 사진을 교체한다
+      if(selectedClip !== null && clips[selectedClip]){
+        replaceClipPhoto(selectedClip, p.url, p.credit || '');
+        return;
+      }
       if(isDuplicateUrl(p.url)){
         setStatus('🔁 이미 사용 중인 사진이에요. 다른 사진을 골라주세요.');
         return;
@@ -988,6 +1026,59 @@ function showPhotos(items, append){
     };
     box.appendChild(wrap);
   });
+  markUsedThumbs();
+}
+
+/* 선택한 장면의 사진만 교체 (자막·효과·길이 유지) */
+async function replaceClipPhoto(idx, url, credit){
+  const c = clips[idx];
+  if(!c) return;
+
+  // 다른 장면이 쓰는 사진이면 막는다
+  const usedElsewhere = clips.some((x, n) => n !== idx && x.url === url);
+  if(usedElsewhere){
+    setStatus('🔁 다른 장면에서 이미 쓰는 사진이에요. 다른 사진을 골라주세요.');
+    flashUsedThumb(url);
+    return;
+  }
+
+  setStatus('🖼️ ' + (idx+1) + '번 장면 사진을 바꾸는 중…');
+  c.url = url;   // 먼저 확정해 중복 판정이 바로 반영되게
+
+  const img = await new Promise(res => {
+    const im = new Image();
+    im.crossOrigin = 'anonymous';
+    im.onload = () => res(im);
+    im.onerror = () => res(null);
+    im.src = url;
+  });
+
+  if(!img){ setStatus('사진을 불러오지 못했어요.'); return; }
+
+  delete c.vid; delete c.trimStart; delete c.trimEnd;
+  c.type = 'photo';
+  c.img = img;
+  c.credit = credit;
+  if(!c.dur || c.dur <= 0) c.dur = Math.max(0.5, +$('dur').value || 2);
+
+  selectedClip = null;
+  updatePickHint();
+  render(); draw(0); updateTotal();
+  setStatus('✅ ' + (idx+1) + '번 장면 사진을 바꿨어요!');
+}
+
+/* 교체 대상 선택 안내 */
+function updatePickHint(){
+  const box = $('pickHint');
+  if(!box) return;
+  if(selectedClip === null || !clips[selectedClip]){
+    box.classList.remove('on');
+    selectedClip = null;
+  } else {
+    box.classList.add('on');
+    $('pickHintText').textContent =
+      '📌 ' + (selectedClip + 1) + '번 장면 선택됨 · 아래 사진 검색에서 새 사진을 누르면 교체됩니다';
+  }
   markUsedThumbs();
 }
 
@@ -2188,6 +2279,9 @@ function render(){
       b.onclick = () => {
         if(a==='del'){
           clips.splice(i,1);
+          if(selectedClip === i) selectedClip = null;
+          else if(selectedClip !== null && selectedClip > i) selectedClip--;
+          updatePickHint();
         } else {
           const dir = a==='up' ? -1 : 1;
           const j = findSwapTarget(i, dir);
@@ -2212,7 +2306,26 @@ function render(){
     handle.textContent = '⋮⋮';
     handle.title = '드래그해서 순서 변경';
 
+    // 장면 번호 (이동하면 자동으로 다시 매겨진다)
+    const no = document.createElement('div');
+    no.className = 'clip-no';
+    no.textContent = String(i + 1);
+    if(isVid) el.classList.add('is-video');
+
+    // 선택 상태 표시
+    if(selectedClip === i) el.classList.add('selected');
+
+    // 썸네일을 누르면 이 장면을 교체 대상으로 선택
+    thumb.style.cursor = 'pointer';
+    thumb.title = '눌러서 선택 → 사진 검색에서 새 사진을 고르면 교체됩니다';
+    thumb.onclick = () => {
+      selectedClip = (selectedClip === i) ? null : i;
+      updatePickHint();
+      render();
+    };
+
     el.appendChild(handle);
+    el.appendChild(no);
     el.appendChild(thumb);
     el.appendChild(info);
     el.appendChild(btns);
@@ -3693,6 +3806,13 @@ try{
   }
 })();
 
+$('pickCancel').onclick = () => {
+  selectedClip = null;
+  updatePickHint();
+  render();
+  setStatus('선택을 해제했어요.');
+};
+
 $('reset').onclick = () => {
   if(!confirm('모든 장면, 자막, 설정을 지우고 처음 상태로 돌아갑니다. 계속할까요?')) return;
 
@@ -3740,6 +3860,8 @@ $('reset').onclick = () => {
   });
 
   seekPos = -1;
+  selectedClip = null;
+  updatePickHint();
   $('ratio').value = '16:9';
   applyRatio();
   $('sceneCount').value = '10';
@@ -3856,7 +3978,7 @@ function captionKeywords(text){
   for(const k of keys){
     if(text.includes(k) && !found.some(f => f.ko.includes(k))){
       found.push({ko:k, en:VISUAL_WORDS[k]});
-      if(found.length >= 2) break;   // 2개면 충분
+      if(found.length >= 3) break;   // 최대 3개
     }
   }
   return found.map(f => f.en);
@@ -3884,43 +4006,85 @@ async function findPhotoForCaption(idx){
   }
   const placeHead = place.split(/\s+/)[0] || '';
 
-  // 검색어 조합: 중복 낱말은 제거한다
+  /* 검색어 조합을 넓게 만든다.
+     지명+낱말 조합을 낱말별로 각각 만들어 후보 수를 늘린다. */
   const uniq = arr => [...new Set(arr.filter(Boolean))];
   const cands = [];
-  if(placeHead && visualEn.length) cands.push(uniq([placeHead, ...visualEn]).join(' '));
-  if(placeHead && visualEn[0])     cands.push(uniq([placeHead, visualEn[0]]).join(' '));
-  if(visualEn.length)              cands.push(uniq(visualEn).join(' '));
-  if(visualEn[0])                  cands.push(visualEn[0]);
-  if(placeHead)                    cands.push(placeHead);
+
+  // 1) 지명 + 각 시각 낱말 (가장 관련도 높음)
+  for(const kw of visualEn){
+    if(placeHead) cands.push(placeHead + ' ' + kw);
+  }
+  // 2) 지명 + 낱말 두 개 조합
+  if(placeHead && visualEn.length >= 2){
+    cands.push(placeHead + ' ' + visualEn[0] + ' ' + visualEn[1]);
+  }
+  // 3) 장면 역할 키워드도 섞는다
+  const roleKey = (scenario && scenario.scenes[idx]) ? scenario.scenes[idx].role : null;
+  if(roleKey && ROLES[roleKey]){
+    for(const rk of ROLES[roleKey].kws.slice(0, 2)){
+      if(placeHead) cands.push(placeHead + ' ' + rk);
+      cands.push(rk);
+    }
+  }
+  // 4) 낱말만
+  for(const kw of visualEn) cands.push(kw);
+  if(visualEn.length >= 2) cands.push(visualEn.join(' '));
+  // 5) 최후: 지명만
+  if(placeHead) cands.push(placeHead);
 
   if(!cands.length){
     setStatus('🔍 자막에서 사진으로 찾을 만한 낱말을 못 찾았어요. "바다", "골목", "노을" 같은 낱말을 넣어보세요.');
     return;
   }
 
-  // 현재 장면 자신의 사진은 교체 대상이므로 제외 목록에서 뺀다
+  /* 제외 목록
+     - 다른 장면이 쓰는 사진
+     - 이 장면에서 이미 보여준 사진 (버튼을 다시 누르면 다음 후보로 넘어가도록) */
   const used = new Set(clips.filter((x,n) => n !== idx).map(x => x.url));
+  if(!c._seen) c._seen = [];
+  c._seen.forEach(u => used.add(u));
+  if(c.url) used.add(c.url);
 
-  /* 후보를 넉넉히 모은다.
-     한 검색어에서 12장만 보면 여러 장면이 같은 사진을 집게 되므로,
-     사다리 후보를 순회하며 안 쓴 사진이 나올 때까지 계속 찾는다. */
+  /* 안 쓴 사진이 나올 때까지 검색어 × 페이지를 넓게 훑는다 */
   let hit = null, usedQuery = '';
   const tryList = uniq(cands);
+  const MAX_PAGE = 6;   // 검색어당 최대 144장
+
   for(const q of tryList){
-    // 한 검색어당 여러 페이지를 훑는다
-    for(let page = 0; page < 3 && !hit; page++){
+    for(let page = 0; page < MAX_PAGE && !hit; page++){
       const r = await photoSearch(q, 24, page * 24);
       if(!r.items || !r.items.length) break;
-      hit = r.items.find(p => !used.has(p.url)) || null;
-      if(hit) usedQuery = (r.query || q);
+      const found = r.items.find(p => !used.has(p.url));
+      if(found){ hit = found; usedQuery = (r.query || q); }
     }
     if(hit) break;
   }
 
+  /* 전부 본 사진이면 이 장면의 기록을 비우고 처음부터 다시 순환한다 */
   if(!hit){
-    setStatus('🔍 "' + tryList[0] + '" 로 찾은 사진이 모두 이미 쓰였어요. 자막 낱말을 바꾸거나 검색어를 조정해보세요.');
+    c._seen = [];
+    const used2 = new Set(clips.filter((x,n) => n !== idx).map(x => x.url));
+    for(const q of tryList){
+      for(let page = 0; page < MAX_PAGE && !hit; page++){
+        const r = await photoSearch(q, 24, page * 24);
+        if(!r.items || !r.items.length) break;
+        const found = r.items.find(p => !used2.has(p.url));
+        if(found){ hit = found; usedQuery = (r.query || q); }
+      }
+      if(hit) break;
+    }
+    if(hit) setStatus('🔁 후보를 다 봐서 처음부터 다시 찾았어요.');
+  }
+
+  if(!hit){
+    setStatus('🔍 "' + tryList[0] + '" 로 쓸 수 있는 사진이 없어요. 자막 낱말을 바꿔보세요.');
     return;
   }
+
+  // 이 장면에서 본 사진으로 기록
+  c._seen.push(hit.url);
+  if(c._seen.length > 60) c._seen = c._seen.slice(-40);
 
   /* URL 을 먼저 확정해 둔다.
      이미지 로딩은 비동기라서, 여기서 c.url 을 즉시 잡아두지 않으면
@@ -3956,6 +4120,9 @@ $('allCapToPhoto').onclick = async () => {
   if(!targets.length){ setStatus('✍️ 자막이 입력된 장면이 없어요.'); return; }
   const btn = $('allCapToPhoto');
   btn.disabled = true; btn.textContent = '🔍 찾는 중…';
+
+  // 일괄 실행은 처음부터 다시 찾는다
+  clips.forEach(c => { c._seen = []; });
 
   let ok = 0, n = 0;
   for(const {i} of targets){
