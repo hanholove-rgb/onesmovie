@@ -2845,39 +2845,100 @@ function showResult(blob, name){
   box.innerHTML = '';
   box.style.display = 'flex';
 
+  const sizeMB = (blob.size / 1048576).toFixed(1);
+
+  /* 환경 판단 */
+  const isIOS     = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  const isMobile  = isIOS || isAndroid;
+
+  /* File 객체 생성 시도 */
+  let file = null;
+  try{ file = new File([blob], name, {type: blob.type || 'video/mp4'}); }catch(e){}
+  let canShareFile = false;
+  try{ canShareFile = !!(file && navigator.canShare && navigator.canShare({files:[file]})); }catch(e){}
+
+  console.log('[저장] size='+blob.size+' type='+blob.type
+    +' isIOS='+isIOS+' share='+!!navigator.share+' canFile='+canShareFile);
+
+  /* ─── 아이폰 ─────────────────────────────────────────── */
+  if(isIOS){
+    if(canShareFile){
+      const sh = document.createElement('button');
+      sh.textContent = '📤 공유 · 사진에 저장';
+      sh.onclick = async () => {
+        sh.disabled = true;
+        try{
+          await navigator.share({files:[file], title: $('title').value || '홍보 영상'});
+        }catch(e){
+          if(e.name !== 'AbortError')
+            setStatus('공유 실패 · ' + e.message + ' — 영상을 길게 눌러 저장해보세요.');
+        } finally{ sh.disabled = false; }
+      };
+      box.appendChild(sh);
+    }
+    // 미리보기 (길게 눌러 저장)
+    const v = document.createElement('video');
+    v.src = URL.createObjectURL(blob);
+    v.controls = true; v.playsInline = true; v.preload = 'metadata';
+    v.style.cssText = 'width:100%;border-radius:14px;margin-top:8px';
+    box.appendChild(v);
+    const tip = document.createElement('div');
+    tip.className = 'hint';
+    tip.innerHTML = '💡 <b>📤 공유 → 비디오 저장</b> 또는 위 영상을 <b>길게 눌러</b> 저장하세요.<br>'
+      + '형식: ' + blob.type + ' · ' + sizeMB + 'MB';
+    box.appendChild(tip);
+    setStatus('✅ 완성! 공유 버튼을 눌러 사진 앱에 저장하세요.');
+    return;
+  }
+
+  /* ─── PC / 안드로이드 ────────────────────────────────── */
+  /* Blob → Object URL 대신 실제 다운로드 링크 생성 */
+  const objectUrl = URL.createObjectURL(blob);
+
+  /* 내려받기 */
   const dl = document.createElement('button');
-  dl.textContent = '⬇️ 내려받기';
+  dl.textContent = '⬇️ 내려받기 (' + sizeMB + 'MB)';
   dl.onclick = () => {
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
+    a.href = objectUrl;
     a.download = name;
+    a.style.display = 'none';
     document.body.appendChild(a);
     a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+    setTimeout(() => { a.remove(); }, 2000);
+    setStatus('⬇️ 다운로드가 시작됐어요. 브라우저 다운로드 폴더를 확인하세요.');
   };
   box.appendChild(dl);
 
-  // 아이폰에서는 공유 시트를 거쳐야 사진 앱에 저장된다
-  let file = null;
-  try{ file = new File([blob], name, {type: blob.type}); }catch(e){}
-  if(file && navigator.canShare && navigator.canShare({files: [file]})){
+  /* 안드로이드: 파일 공유 */
+  if(isAndroid && canShareFile && navigator.share){
     const sh = document.createElement('button');
     sh.className = 'ghost';
-    sh.textContent = '📤 공유 · 사진에 저장';
+    sh.textContent = '📤 공유 · 저장';
     sh.onclick = async () => {
-      try{ await navigator.share({files: [file], title: $('title').value || '홍보 영상'}); }
-      catch(e){ if(e.name !== 'AbortError') setStatus('공유를 열지 못했습니다 - ' + e.message); }
+      sh.disabled = true;
+      try{ await navigator.share({files:[file], title: $('title').value || '홍보 영상'}); }
+      catch(e){ if(e.name !== 'AbortError') setStatus('공유 실패 · ' + e.message); }
+      finally{ sh.disabled = false; }
     };
     box.appendChild(sh);
   }
 
+  /* 미리보기 */
   const v = document.createElement('video');
-  v.src = URL.createObjectURL(blob);
-  v.controls = true;
-  v.playsInline = true;
+  v.src = objectUrl;
+  v.controls = true; v.playsInline = true; v.preload = 'metadata';
   v.style.cssText = 'width:100%;border-radius:14px;margin-top:8px';
   box.appendChild(v);
+
+  const tip = document.createElement('div');
+  tip.className = 'hint';
+  tip.innerHTML = isAndroid
+    ? '💡 <b>⬇️ 내려받기</b> 또는 <b>📤 공유</b>로 저장하세요. 안 되면 영상을 길게 누르세요.<br>'
+    : '💡 <b>⬇️ 내려받기</b>를 누르세요. 안 되면 영상 위에서 <b>우클릭 → 다른 이름으로 저장</b>하세요.<br>';
+  tip.innerHTML += '형식: ' + blob.type + ' · ' + sizeMB + 'MB';
+  box.appendChild(tip);
 }
 
 $('export').onclick = () => {
@@ -2924,11 +2985,11 @@ $('export').onclick = () => {
     const ext = extFor(type);
     const blob = new Blob(chunks, {type});
     if(!blob.size){
-      setStatus('녹화된 데이터가 없습니다. 다시 시도해 주세요.');
+      setStatus('⚠️ 녹화된 데이터가 없어요. 장면 길이를 1초 이상으로 늘리고 다시 시도해보세요.');
     }else{
       showResult(blob, 'promo-' + Date.now() + '.' + ext);
       setStatus('✅ 완료 · ' + ext.toUpperCase() + ' · ' + (blob.size / 1048576).toFixed(1) + 'MB'
-        + (navigator.canShare ? ' · 아래에서 내려받거나 사진 앱에 저장하세요.' : ' · 아래에서 내려받으세요.'));
+        + ' · 아래 버튼으로 저장하세요.');
     }
     $('export').disabled = false; $('export').textContent = '💾 영상 내보내기';
   };
